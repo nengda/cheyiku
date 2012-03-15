@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dtsui:Dialog xmlns="*" xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:dtsui="DTS.UI.*" width="600" height="400" title="Log Messages">
+	<mx:Script>
+		<![CDATA[
+			import mx.controls.Label;
+			import mx.core.Application;
+			import mx.collections.ArrayCollection;
+			import mx.managers.PopUpManager;
+
+			public static var Enabled:Boolean = false;
+			private static var logWindow:LogWindow = null;
+			public static function Log(sender:String, message:String):void {
+				if (!Enabled) return;
+				if (logWindow == null) {
+					logWindow = Dialog.Open(LogWindow, false, false) as LogWindow;
+					logWindow.x = 10;
+					logWindow.y = 10;
+				}
+				logWindow.messages.addItemAt({
+					"time": new Date(),
+					"sender": sender,
+					"message": message
+				}, 0);
+			}
+
+			[Bindable]
+			private var messages:ArrayCollection = new ArrayCollection([{
+				"time": new Date(),
+				"sender": "---",
+				"message": "---"
+			}]);
+
+			private var btnHide:Label;
+			private var btnShow:LogWindowButton;
+			private var timer:Timer;
+
+			protected override function createChildren():void {
+				super.createChildren();
+
+				btnHide = new Label();
+				btnHide.text = "hide";
+				btnHide.setStyle("color", 0x999999);
+				btnHide.setStyle("fontWeight", "bold");
+				btnHide.addEventListener(MouseEvent.MOUSE_OVER, function(event:MouseEvent):void {
+					btnHide.setStyle("color", 0x666666);
+					btnHide.setStyle("textDecoration", "underline");
+				});
+				btnHide.addEventListener(MouseEvent.MOUSE_OUT, function(event:MouseEvent):void {
+					btnHide.setStyle("color", 0x999999);
+					btnHide.setStyle("textDecoration", "");
+				});
+				btnHide.addEventListener(MouseEvent.CLICK, OnHide);
+				TitleButtons = btnHide;
+
+				timer = new Timer(1000);
+				timer.addEventListener(TimerEvent.TIMER, OnTimerTick);
+				timer.start();
+			}
+
+			private function OnHide(event:MouseEvent):void {
+				btnShow = LogWindowButton.Open(this);
+				visible = false;
+			}
+
+			private function OnTimerTick(event:TimerEvent):void {
+				if (visible) {
+					BringToFront();
+				}
+				else {
+					btnShow.BringToFront();
+				}
+			}
+		]]>
+	</mx:Script>
+	<mx:DataGrid id="dgLog" width="100%" height="100%" dataProvider="{messages}" alternatingItemColors="[#FFFFFF, #FFFFFF]" horizontalGridLines="true" horizontalGridLineColor="#f7f7f7" verticalGridLines="true" verticalGridLineColor="#f7f7f7" headerColors="[#F7F7F7, #F7F7F7]" variableRowHeight="true">
+		<mx:columns>
+			<mx:DataGridColumn headerText="Time" dataField="time" width="130"/>
+			<mx:DataGridColumn headerText="Sender" dataField="sender" width="120"/>
+			<mx:DataGridColumn headerText="Message" dataField="message" itemRenderer="DTS.Logger.LogWindowItemRenderer"/>
+		</mx:columns>
+	</mx:DataGrid>	
+	<mx:ControlBar horizontalAlign="right" paddingTop="0">
+	</mx:ControlBar>
+</dtsui:Dialog>

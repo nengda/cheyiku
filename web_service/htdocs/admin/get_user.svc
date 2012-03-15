@@ -1,0 +1,27 @@
+use CYC::Web::Model::User;
+
+use Log::Log4perl;
+my $_logger = Log::Log4perl::get_logger(__PACKAGE__);
+
+sub admin_only {
+    return 1;
+}
+
+sub args {
+    return {
+        email => 1,
+    };
+}
+
+sub process_request {
+    my ($self, $r, $args) = @_;
+    my $user = CYC::Web::Model::User->new(email => $args->{email})->load;
+
+    $_logger->debug($user->create_timestamp);
+    return {
+        email => $user->email,
+        full_name => $user->full_name,
+        is_admin => ($user->is_admin ? 'Y' : 'N'),
+        create_timestamp => $user->create_timestamp->iso8601()
+    };
+}

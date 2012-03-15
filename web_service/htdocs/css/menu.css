@@ -1,0 +1,126 @@
+#dts-header-menu {
+    position: absolute;
+    left: 5px;
+    right: 0px;
+    cursor: default;
+    z-index: 500;
+}
+
+#dts-header-menu a {
+    display: block;
+    text-decoration: none;
+}
+
+#dts-header-menu ul {
+	list-style: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+#dts-header-menu li {
+	display: block;
+}
+
+#dts-header-menu ul li {
+	float: left;
+}
+
+#dts-header-menu ul li ul li {
+	float: none;
+}
+
+#dts-header-menu li ul {
+	position: absolute;
+	display: none;
+}
+
+.dts-header-menu-root {
+	position: relative;
+	height: 37px;
+}
+
+.dts-header-menu-root-item {
+	height: 25px;
+	color: #e7e7e7;
+	padding-top: 12px;
+	padding-left: 5px;
+	padding-right: 19px;
+}
+
+.dts-header-menu-root-item-arrow {
+    position: absolute;
+    top: 14px;
+    right: 5px;
+    width: 9px;
+    height: 9px;
+    background: url("/images/arrow_down.png");
+}
+
+.dts-header-brand {
+	height: 25px;
+    color: #e7e7e7;
+    font-weight: bold;
+    padding-top: 12px;
+    padding-left: 35px;
+    padding-right: 19px;
+    background: url("/images/yahoo_e7.png") no-repeat 5px 10px;
+}
+
+.dts-header-menu-item {
+	border-top: #000000 1px solid;
+	background: #000000;
+}
+
+.dts-header-menu-item a {
+	height: 22px;
+	color: #a7a7a7;
+	padding-top: 7px;
+	padding-left: 10px;
+    padding-right: 20px;
+	background: #000000;
+}
+
+.dts-header-menu-item:hover {
+	background: #333333;
+}
+
+.dts-header-menu-item:hover a {
+	color: #e7e7e7;
+	background: #333333;
+}
+
+.dts-header-menu-bl {
+	position: absolute;
+    bottom: 0px;
+    left: 0px;
+    width: 4px;
+    height: 4px;
+    background: url("/images/corner_black_bl_4.png") no-repeat 0 0;
+}
+
+.dts-header-menu-b {
+    position: absolute;
+    bottom: 0px;
+    left: 4px;
+    right: 4px;
+    height: 4px;
+    background: #000000;
+}
+
+.dts-header-menu-br {
+    position: absolute;
+    bottom: 0px;
+    right: 0;
+    width: 4px;
+    height: 4px;
+    background: url("/images/corner_black_br_4.png") no-repeat 0 0;
+}
+
+/* Drop down */
+#dts-header-menu li:hover div.dts-header-menu-root {
+	background: url("/images/black_50.png");
+}
+
+#dts-header-menu li:hover ul {
+	display: block;
+}

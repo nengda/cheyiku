@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DialogFixed xmlns="DTS.UI.*" xmlns:mx="http://www.adobe.com/2006/mxml" width="400" height="220" title="用户资料" layout="absolute" borderThicknessLeft="0" borderThicknessRight="0" creationComplete="OnCreationComplete()">
+	<mx:Script>
+		<![CDATA[
+			import DTS.Net.HTTPClient;
+			import DTS.UI.BlockingWindow;
+			import DTS.UI.MessageBox;
+			import DTS.Logger.LogWindow;
+
+			private var _user:XML = null;
+
+			public static function Open(user:XML):UserEditor {
+				var dlg:UserEditor = DialogFixed.Open(UserEditor) as UserEditor;
+				dlg._user = user;
+				return dlg;
+			}
+
+			private function OnCreationComplete():void {
+				if (_user == null) {
+					callLater(OnCreationComplete);
+					return;
+				}
+				if (_user.email == undefined) {
+					title = "新用戶";
+					this.height = 276;
+					cvsPassword.includeInLayout = true;
+					cvsPassword.visible = true;
+					cvsRepeat.includeInLayout = true;
+					cvsRepeat.visible = true;
+					lblCompulsory.visible = true;
+					lblStarName.visible = true;
+					lblStarEmail.visible = true;
+				}
+				else {
+					this.height = 220;
+					cvsPassword.includeInLayout = false;
+					cvsPassword.visible = false;
+					cvsRepeat.includeInLayout = false;
+					cvsRepeat.visible = false;
+					lblCompulsory.visible = false;
+					lblStarName.visible = false;
+					lblStarEmail.visible = false;
+
+					txtEmail.enabled = false;
+					txtEmail.text = _user.email;
+					txtName.text = _user.full_name;
+					comboIsAdmin.selectedItem = _user.is_admin.toString();
+					comboIsActive.selectedItem = _user.is_deleted.toString();
+				}
+			}
+
+			private function Save():void {
+				if (_user.email == undefined && txtEmail.text.match(/^\s*$/) != null) {
+					MessageBox.Show("Email呢？\n\n", "", function():void{
+						txtEmail.setFocus();
+					});
+					return;
+				}
+
+				if (txtName.text.match(/^\s*$/) != null) {
+					MessageBox.Show("姓名呢？\n\n", "", function():void{
+						txtName.setFocus();
+					});
+					return;
+				}
+
+				if (_user.email == undefined) {
+					if (txtPassword.text.match(/^\s*$/) != null) {
+						MessageBox.Show("密码呢？\n\n", "", function():void{
+							txtPassword.setFocus();
+						});
+						return;
+					}
+					if (txtRepeat.text.match(/^\s*$/) != null) {
+						MessageBox.Show("重复一下密码？\n\n", "", function():void{
+							txtRepeat.setFocus();
+						});
+						return;
+					}
+					if (txtRepeat.text != txtPassword.text) {
+						MessageBox.Show("密码重复得不一样？\n\n", "", function():void{
+							txtPassword.setFocus();
+						});
+						return;
+					}
+				}
+
+				visible = false;
+				var blockingWindow:BlockingWindow = BlockingWindow.Open();
+				var request:Object = {
+					"email": txtEmail.text,
+					"full_name": txtName.text,
+					"is_admin" : ((comboIsAdmin.selectedItem as String) == "是" ? "1" : "0"),
+					"is_deleted" : ((comboIsActive.selectedItem as String) == "开启" ? "0" : "1")
+				};
+				if (_user.email == undefined) {
+					request.password = txtPassword.text;
+				}
+				HTTPClient.Post(
+					"UserEditor",
+					Settings.EndPoint + "update_user.svc",
+					request,
+					function(response:String):void {
+						blockingWindow.Close();
+						visible = true;
+						var xml:XML = XML(response);
+						if (xml.status.toString().toLowerCase() == "ok") {
+							GlobalEvents.FireEvent(GlobalEvents.REFRESH_USERS);
+							Close();
+						}
+						else {
+							MessageBox.Show(xml.data.toString() + "\n\n");
+						}
+					}
+				);
+			}
+		]]>
+	</mx:Script>
+	<mx:Canvas borderStyle="solid" borderSides="top,bottom" left="0" right="0" top="0" bottom="0" backgroundColor="#FFFFFF">
+		<mx:Label x="20" y="22" text="Email:"/>
+		<mx:Label y="24" x="82" text="*" color="red" id="lblStarEmail"/>
+		<mx:TextInput id="txtEmail" y="20" left="99" right="25"/>
+		<mx:Label x="20" y="50" text="姓名:"/>
+		<mx:Label y="52" x="82" text="*" color="red" id="lblStarName"/>
+		<mx:TextInput id="txtName" y="48" left="99" right="25"/>
+		<mx:Label x="20" y="78" text="管理员?:"/>
+		<mx:ComboBox id="comboIsAdmin" y="76" left="99" right="25">
+			<mx:dataProvider>
+				<mx:ArrayCollection>
+					<mx:String>是</mx:String>
+					<mx:String>否</mx:String>
+				</mx:ArrayCollection>
+			</mx:dataProvider>
+		</mx:ComboBox>
+		<mx:Label x="20" y="106" text="状态:"/>
+		<mx:ComboBox id="comboIsActive" y="104" left="99" right="25">
+			<mx:dataProvider>
+				<mx:ArrayCollection>
+					<mx:String>开启</mx:String>
+					<mx:String>禁用</mx:String>
+				</mx:ArrayCollection>
+			</mx:dataProvider>
+		</mx:ComboBox>
+		<mx:Canvas id="cvsPassword" x="20" y="134" width="100%" includeInLayout="false" visible="false">
+			<mx:Label x="0" y="2" text="密码:"/>
+			<mx:Label x="62" y="4" text="*" color="red"/>
+			<mx:TextInput id="txtPassword" y="0" left="79" right="25" displayAsPassword="true"/>
+		</mx:Canvas>
+		<mx:Canvas id="cvsRepeat" x="20" y="162" width="100%" includeInLayout="false" visible="false">
+			<mx:Label x="0" y="2" text="重复密码:"/>
+			<mx:Label x="62" y="4" text="*" color="red"/>
+			<mx:TextInput id="txtRepeat" y="0" left="79" right="25" displayAsPassword="true"/>
+		</mx:Canvas>
+	</mx:Canvas>
+	<ControlBarResizable horizontalAlign="right" x="0" y="276" paddingTop="8">
+		<mx:Label text="* 必须填写" color="red" id="lblCompulsory" visible="false"/>
+		<mx:Spacer width="100%"/>
+		<mx:Button label="保存" id="btnOK" click="Save()"/>
+		<mx:Button label="取消" id="btnCancel" click="Close()"/>
+	</ControlBarResizable>
+</DialogFixed>

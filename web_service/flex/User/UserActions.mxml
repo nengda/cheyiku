@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" alpha="0" horizontalScrollPolicy="off">
+	<mx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+
+			private static var _instances:ArrayCollection = new ArrayCollection();
+
+			public var IsItemHighlighted:Function = null;
+
+			public static function ItemToInstance(o:Object):UserActions {
+				for (var i:int = _instances.length - 1; i >= 0; i--) {
+					var instance:UserActions = _instances[i];
+					if (IsSameItem(instance.data, o)) {
+						return instance;
+					}
+				}
+				return null;
+			}
+
+			private static function IsSameItem(a:Object, b:Object):Boolean {
+				if (a != null && b != null) {
+					var toolA:String = a.email;
+					var toolB:String = b.email;
+					if (toolA == toolB) {
+						return true;
+					}
+				}
+				return false;
+			}
+
+			override public function set data(value:Object):void {
+				super.data = value;
+				if (_instances.contains(this)) {
+					_instances.removeItemAt(_instances.getItemIndex(this));
+				}
+				if (value != null) {
+					_instances.addItem(this);
+					alpha = (IsItemHighlighted(value)) ? 1 : 0;
+				}
+				else {
+					alpha = 0;
+				}
+			}
+		]]>
+	</mx:Script>
+	<mx:Style>
+		.HoverButton {
+			upSkin: ClassReference("mx.skins.ProgrammaticSkin");
+		}
+	</mx:Style>
+	<mx:HBox x="2" verticalCenter="0" horizontalGap="0">
+		<mx:Button id="btnEdit" icon="{Icons.ICO_EDIT}" toolTip="编辑" width="20" height="20" styleName="HoverButton">
+			<mx:click>
+				<![CDATA[
+					UserEditor.Open(data as XML);
+				]]>
+			</mx:click>
+		</mx:Button>
+	</mx:HBox>
+</mx:Canvas>

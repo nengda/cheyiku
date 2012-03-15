@@ -1,0 +1,110 @@
+#!/usr/local/bin/perl
+
+use strict;
+use warnings;
+
+use DateTime;
+
+die "\$FLEX_HOME is not set\n" unless $ENV{FLEX_HOME};
+
+my $src_dir = $ENV{CYC_HOME} . "/web_service";
+my $flex_lib_dir = $ENV{CYC_HOME} . "/flexlib";
+
+my $version = `awk '/^[Vv]ersion/ {print \$2; exit}' $src_dir/README`;
+$version =~ s/\r|\n//g;
+my ($major, $minor, $patch) = split(/\./, $version);
+
+my $t = DateTime->now;
+my $user = $ENV{USER};
+
+my $flex_app_build_info = $src_dir . "/flex/Build.as";
+open FH, ">$flex_app_build_info";
+print FH qq/package
+{
+    import DTS.Configurations.BuildTypes;
+
+    public final class Build
+    {
+        public static const Type:String = BuildTypes.RELEASE;
+        public static const Version:String = "$version";
+        public static const Time:String = "$t";
+        public static const By:String = "$user";
+    }
+}/;
+close FH;
+
+# Compile DTSFlexLib
+system("cd $flex_lib_dir && ./build.pl 1>&2") == 0 || die "Failed compiling DTSFlexLib\n";
+
+# Compile the UI
+system("rm -rf $src_dir/flex/bin");
+system("mkdir -p $src_dir/flex/bin");
+system("\$FLEX_HOME/bin/mxmlc -output $src_dir/flex/bin/AdminUI.swf -compiler.include-libraries=$flex_lib_dir/DTSFlexLib.swc -compiler.source-path=$src_dir/flex $src_dir/flex/AdminUI.mxml 1>&2") == 0 || die "Failed compiling the UI\n";
+system("\$FLEX_HOME/bin/mxmlc -output $src_dir/flex/bin/ToolUI.swf -compiler.include-libraries=$flex_lib_dir/DTSFlexLib.swc -compiler.source-path=$src_dir/flex $src_dir/flex/ToolUI.mxml 1>&2") == 0 || die "Failed compiling the UI\n";
+
+# Clean up
+unlink $flex_app_build_info;
+
+print qq{
+PRODUCT_NAME = cyc_web
+SRCDIRS=\$(CYC_HOME)/web_service
+VERSION = $version
+SHORT_DESC = CYC Web Framework
+LONG_DESC = `cat \$(SRCDIRS)/README`
+CUSTODIAN = ysm-dts-monkeys\@yahoo-inc.com http://twiki.corp.yahoo.com/view/AdApps/SASTDTS
+PACKAGE_OS_SPECIFIC = no
+
+OWNER = yahoo
+GROUP = dev
+PERM = 0444
+
+YINST bug-product CYC
+YINST bug-component Web Framemwork
+
+# Files/Directories
+dir 0775 yahoo dev conf/cyc_web
+dir 0775 yahoo dev conf/cyc_web/auth
+dir 0775 yahoo dev share/www
+dir 0775 yahoo dev share/www/cyc
+dir 0775 yahoo dev share/mason
+dir 0775 yahoo dev share/mason/cache
+dir 0775 yahoo dev share/mason/obj
+dir 0775 yahoo dev share/mason/run
+find - - - conf/cyc_web/auth/ \$(SRCDIRS)/conf/auth -type f ! -regex '.*/.svn.*'
+find - - - lib/perl5/site_perl/ \$(SRCDIRS)/lib -type f -name '*.pm' ! -regex '.*/.svn.*'
+find - - - share/www/cyc/ \$(SRCDIRS)/htdocs -type f ! -regex '.*/.svn.*'
+find - - - share/www/cyc/admin/ \$(SRCDIRS)/flex/bin -name '*.swf'
+
+# Configuration
+configfile 644 - - conf/yapache/include/cyc_web.conf \$(SRCDIRS)/conf/yapache.conf overwrite expand
+configfile 644 - - conf/cyc_web.yml \$(SRCDIRS)/conf/config.yml expand overwrite
+
+# Prerequisites
+YINST requires pkg cyc_core 0.1.0 0.9999.9999
+YINST requires pkg perl 5.10.1_04 5.9999.9999
+YINST requires pkg yapache 1.155.5 1.9999.9999
+YINST requires pkg yapache_mod_perl 1.30_03 1.9999
+YINST requires pkg ypan/perl-Apache-DBI 1.08_01 1.9999
+YINST requires pkg ypan/perl-CGI.pm 3.49_01 3.9999
+YINST requires pkg ypan/perl-Data-Dumper 2.128_02 2.9999
+YINST requires pkg ypan/perl-DateTime 0.6500_01 0.9999
+YINST requires pkg ypan/perl-Digest-SHA1 2.13_02 2.9999
+YINST requires pkg ypan/perl-HTML-Mason 1.42_01 1.9999
+YINST requires pkg ypan/perl-Log-Log4perl 1.32_02 1.9999
+YINST requires pkg ypan/perl-Params-Validate 0.95_03 0.9999
+YINST requires pkg ypan/perl-PathTools 3.33_04 3.9999
+YINST requires pkg ypan/perl-Scalar-List-Utils 1.23_03 1.9999
+YINST requires pkg ypan/perl-base 2.12_03 2.9999
+YINST requires pkg ypan/perl-libapreq 1.33_02 1.33_02
+
+
+# Settings
+YINST set Apache_HTTPPort               8080
+YINST set Apache_MaxClients             10
+YINST set Apache_MaxRequestsPerChild    50
+YINST set WebService_CacheCompiledCode  1
+YINST set WebService_DefaultLogLevel    DEBUG
+YINST set WebService_SessionExpireTime  900
+};
+
+exit;

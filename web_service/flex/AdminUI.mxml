@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dtscore:Application xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:dtscore="DTS.Core.*" xmlns:dtsui="DTS.UI.*" preloader="DTS.UI.Preloader" creationComplete="OnCreationComplete()" xmlns:local="*">
+	<mx:Script>
+		<![CDATA[
+			import DTS.UI.Colors;
+			import DTS.Utilities.ToolboxInterface;
+			
+            import User.UserPage;
+            import Promoter.PromoterPage;
+            import Client.ClientPage;
+			
+			import mx.collections.ArrayCollection;
+
+			private var _menuItems:ArrayCollection;
+			private var _lastSelection:MenuItem;
+
+			private function OnCreationComplete():void {
+				if (treeMenu == null) {
+					callLater(OnCreationComplete);
+					return;
+				}
+
+				Settings.ApplicationInit();
+
+				_menuItems = new ArrayCollection([
+					new MenuItem("  内部用户", function():Canvas { return new UserPage(); }),
+					new MenuItem("  推广人", function():Canvas { return new PromoterPage(); }),
+					new MenuItem("  客户", function():Canvas { return new ClientPage(); }),
+				]);
+
+				treeMenu.dataProvider = _menuItems;
+				treeMenu.callLater(function():void {
+					ExpandMenu(function():void {
+						_lastSelection = _menuItems[0] as MenuItem;
+						treeMenu.selectedItem = _lastSelection;
+						OnSelectionChanged();
+					});
+				});
+			}
+
+			private function ExpandMenu(onComplete:Function):void {
+				var queue:Array = _menuItems.toArray();
+				for each (var i:MenuItem in queue) {
+					if (i.children != null && i.children.length > 0 && !treeMenu.isItemOpen(i)) {
+						treeMenu.expandItem(i, true);
+						callLater(ExpandMenu, [onComplete]);
+						return;
+					}
+					for each (var c:MenuItem in i.children) {
+						queue.push(c);
+					}
+				}
+				callLater(onComplete);
+			}
+
+			private function OnSelectionChanged():void {
+				var item:MenuItem = treeMenu.selectedItem as MenuItem;
+				if (item != null) {
+					if (!item.selectable || item.control == null) {
+						treeMenu.selectedItem = _lastSelection;
+					}
+					else {
+						var found:Boolean = false;
+						for each (var c:Canvas in pnlMain.getChildren()) {
+							if (c == item.control) {
+								c.visible = true;
+								found = true;
+							}
+							else {
+								c.visible = false;
+							}
+						}
+						if (!found) {
+							item.control.setStyle("left", 0);
+							item.control.setStyle("right", 0);
+							item.control.setStyle("top", 0);
+							item.control.setStyle("bottom", 0);
+							item.control.visible = true;
+							pnlMain.addChild(item.control);
+						}
+						_lastSelection = item;
+					}
+				}
+			}
+
+			private function IconFunction(o:Object):Class {
+				var item:MenuItem = o as MenuItem;
+				var iconClass:Class;
+				switch (item.label) {
+					case "  内部用户":
+						iconClass = Icons.ICO_INTERNAL_USER;
+						break;
+					case "  推广人":
+						iconClass = Icons.ICO_PROMOTER;
+						break;
+					case "  客户":
+						iconClass = Icons.ICO_CLIENT;
+						break;
+				}
+				return iconClass;
+			}
+		]]>
+	</mx:Script>
+	<local:GlobalEvents/>
+	<mx:HDividedBox left="0" right="0" top="{ToolboxInterface.PageTitleHeight}" bottom="0" horizontalGap="3">
+		<mx:Canvas id="pnlMenu" width="140" height="100%" borderStyle="solid" borderSides="right" backgroundColor="#FFFFFF" cornerRadius="0">
+			<dtsui:GradientCanvas left="0" right="0" height="23" fillColors="[#FFFFFF, #EEEEEE]" fillAlphas="[1, 1]" borderStyle="solid" borderSides="top,bottom">
+				<mx:Label verticalCenter="0" fontWeight="bold" text="界面" x="5"/>
+			</dtsui:GradientCanvas>
+			<mx:Tree id="treeMenu" left="0" right="0" top="23" bottom="0" rowHeight="24" borderStyle="none" allowMultipleSelection="false" labelField="label" iconFunction="IconFunction" change="OnSelectionChanged()" fontSize="12"/>
+		</mx:Canvas>
+		<mx:Canvas width="100%" height="100%" borderStyle="solid" borderSides="left">
+			<mx:Canvas left="0" right="0" top="0" bottom="0" borderStyle="solid" borderSides="top" backgroundColor="#FFFFFF"/>
+			<mx:Canvas id="pnlMain" left="0" right="0" top="0" bottom="0"/>
+		</mx:Canvas>
+	</mx:HDividedBox>
+</dtscore:Application>

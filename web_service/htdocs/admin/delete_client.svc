@@ -1,0 +1,19 @@
+use CYC::Web::Model::Client;
+
+sub admin_only {
+    return 1;
+}
+
+sub args {
+    return {
+        id => 1,
+    };
+}
+
+sub process_request {
+    my ($self, $r, $args) = @_;
+    my $client = CYC::Web::Model::Client->new(id => $args->{id})->load;
+    $client->is_deleted(1);
+    $client->save();
+    return 'Success';
+}

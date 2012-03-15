@@ -1,0 +1,117 @@
+#dts-header-menu {
+    position: absolute;
+    left: 5px;
+    right: 0;
+    z-index: 500;
+}
+
+#dts-header-brand {
+    height: 37px;
+    font-weight: bold;
+    background: url("/images/yahoo_e7.png") no-repeat 0px 10px;
+    padding: 12px 0px 0px 30px;
+}
+
+#dts-header-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    float: left;
+}
+
+#dts-header-menu ul li a {
+    height: 37px;
+    color: #e7e7e7;
+    text-align: left;
+    text-decoration: none;
+    display: block;
+    padding: 0 19px 0 5px;
+}
+
+#dts-header-menu ul li a h2 {
+    margin: 0;
+    padding-top: 12px;
+    padding-left: 5px;
+    font-size: 8pt;
+    font-weight: normal;
+}
+
+#dts-header-menu ul li ul {
+    position: absolute;
+    display: none;
+}
+
+#dts-header-menu ul li ul li {
+	height: 29px;
+	border-top: #000000 1px solid;
+	background: #000000;
+}
+
+#dts-header-menu ul li ul li:hover {
+	background: #333333;
+}
+
+#dts-header-menu ul li ul li a {
+	height: 22px;
+	display: block;
+    color: #999999;
+    font-weight: normal;
+    padding-top: 7px;
+    padding-left: 10px;
+    padding-right: 20px;
+    background: transparent;
+}
+
+#dts-header-menu ul li ul li a:hover {
+    color: #cccccc;
+    background: transparent;
+}
+
+#dts-header-menu ul li:hover a {
+    color: #cccccc;
+    background: url("/images/black_50.png");
+}
+
+#dts-header-menu ul li:hover ul {
+    display: block;
+}
+
+.dts-header-menu-root {
+    position: relative;
+}
+
+.dts-header-menu-arrow {
+    position: absolute;
+    top: 14px;
+    right: 5px;
+    width: 9px;
+    height: 9px;
+    background: url("/images/arrow_down.png");
+}
+
+.dts-header-menu-bl {
+	position: absolute;
+    bottom: 0px;
+    left: 0px;
+    width: 4px;
+    height: 4px;
+    background: url("/images/corner_black_bl_4.png") no-repeat 0 0;
+}
+
+.dts-header-menu-b {
+    position: absolute;
+    bottom: 0px;
+    left: 4px;
+    right: 4px;
+    height: 4px;
+    background: #000000;
+}
+
+.dts-header-menu-br {
+    position: absolute;
+    bottom: 0px;
+    right: 0;
+    width: 4px;
+    height: 4px;
+    background: url("/images/corner_black_br_4.png") no-repeat 0 0;
+}

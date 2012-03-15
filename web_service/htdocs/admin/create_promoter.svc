@@ -1,0 +1,33 @@
+use CYC::Web::Model::Promoter;
+use Digest::SHA1 qw/sha1_hex/;
+use DateTime;
+
+use Log::Log4perl;
+my $_logger = Log::Log4perl::get_logger(__PACKAGE__);
+
+sub admin_only {
+    return 1;
+}
+
+sub args {
+    return {
+        id_prefix => 1,
+        email => 1,
+        sex => 1,
+        full_name => 1,
+        club => 0,
+        mobile_number => 1,
+        description => 0,
+    }
+}
+
+sub process_request {
+    my ($self, $r, $args) = @_;
+    $args->{create_timestamp} = DateTime->now();
+    $args->{update_timestamp} = DateTime->now();
+    $args->{is_deleted} = 0;
+    $args->{id} = ($args->{id_prefix} . substr(sha1_hex($args->{email}), 0, 6));
+    $args->{created_by} = $self->user()->email;
+    CYC::Web::Model::Promoter->new(%$args)->save();
+    return "Success";
+}

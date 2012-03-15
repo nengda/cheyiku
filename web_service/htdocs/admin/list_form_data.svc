@@ -1,0 +1,39 @@
+use CYC::Web::Model::Profession;
+use CYC::Web::Model::District;
+use CYC::Web::Model::Car;
+use CYC::Web::Model::Service;
+use CYC::Database::MainDB;
+
+use Log::Log4perl;
+my $_logger = Log::Log4perl::get_logger(__PACKAGE__);
+
+sub process_request {
+    my ($self, $r, $args) = @_;
+    my $form = {
+        profession => [],
+        district => [],
+        service => [],
+    };
+    for my $type (keys %$form) {
+        my $package = "CYC::Web::Model::" . (ucfirst $type);
+        my $objects = $package->get_objects();
+        for my $obj (@$objects) {
+            push @{$form->{$type}}, (join "|", ($obj->id, $obj->name));
+        }
+    }
+    for my $t (keys %$form) {
+        $form->{$t} = join ",", @{$form->{$t}};
+    }
+
+    my $cars = CYC::Web::Model::Car->get_objects(query => "SELECT * FROM cyc_car");
+    my $car_hash = {};
+    for my $car (@$cars) {
+        $car_hash->{$car->brand} = [] unless defined $car_hash->{$car->brand};
+        push @{$car_hash->{$car->brand}}, (join "|", ($car->id, $car->model));
+    }
+    for my $h (keys %$car_hash) {
+        $car_hash->{$h} = join ",", @{$car_hash->{$h}};
+    }
+    $form->{car} = $car_hash;
+    return $form;
+}

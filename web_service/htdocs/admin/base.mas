@@ -1,0 +1,69 @@
+<%once>
+    use CYC::Web::Model::User;
+    use Encode qw/_utf8_on is_utf8/;
+</%once>
+
+<%flags>
+    inherit => undef
+</%flags>
+
+<%shared>
+    # Prepare tool list
+</%shared>
+
+<%init>
+    my $brand_name = "车衣库工具箱";
+    my $tool_title = $m->base_comp->scall_method('title');
+    my $title = (defined $tool_title ? $tool_title : "");
+    $title .= ' - ' if length($title);
+    $title .= '车衣库';
+
+    _utf8_on($title) unless is_utf8($title);
+    _utf8_on($tool_title) unless is_utf8($tool_title);
+    _utf8_on($brand_name) unless is_utf8($brand_name);
+
+    my $user = $r->pnotes()->{current_user};
+    my $admin_only = 1;
+    if ($m->base_comp->attr_exists('admin_only')) {
+        $admin_only = $m->base_comp->attr('admin_only');
+    }
+    if ($admin_only){
+        unless (defined $user && $user->is_admin) {
+            $m->redirect("/login/");
+        }
+    }
+</%init>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title><% $title %></title>
+    <script type="text/javascript" src="/js/utilities.js"></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="/css/layout.css"/>
+    <style type="text/css" media="screen">
+        <& SELF:style &>
+    </style>
+    <script type="text/javascript">
+        <& SELF:script &>
+    </script>
+</head>
+<body>
+    <div id="dts-header">
+        <div id="dts-header-brand"><% $brand_name %></div>
+        <div id="dts-header-user" title="Roles:"><% $user->full_name %></div>
+    </div>
+    <div id="dts-title">
+        <div id="dts-title-text"><% $tool_title %></div>
+    </div>
+
+% $m->call_next();
+</body>
+</html>
+
+<%method title></%method>
+<%method menu></%method>
+<%method script_srcs></%method>
+<%method style_srcs></%method>
+<%method script></%method>
+<%method style></%method>

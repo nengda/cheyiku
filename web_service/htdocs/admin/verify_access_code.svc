@@ -1,0 +1,22 @@
+use CYC::Web::Model::Promoter;
+
+use Log::Log4perl;
+my $_logger = Log::Log4perl::get_logger(__PACKAGE__);
+
+sub args {
+    return {
+        id => 1,
+    };
+}
+
+sub process_request {
+    my ($self, $r, $args) = @_;
+
+    my $promoter = CYC::Web::Model::Promoter->new(id => $args->{id})->load;
+    if (defined $promoter && !$promoter->is_deleted){
+        return 'Success';
+    } else {
+        die "Invalid code";
+    }
+}
+

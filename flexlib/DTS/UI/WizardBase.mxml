@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DialogFixed xmlns="DTS.UI.*" xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute">
+	<mx:Metadata>
+		[Event(name="WizardFinish", type="DTS.Core.GenericEvent")]
+		[Event(name="WizardCancel", type="DTS.Core.GenericEvent")]
+	</mx:Metadata>
+	<mx:Script>
+		<![CDATA[
+			import DTS.Core.GenericEvent;
+			import mx.collections.ArrayCollection;
+
+			public static const EVENT_WIZARDFINISH:String = "WizardFinish";
+			public static const EVENT_WIZARDCANCEL:String = "WizardCancel";
+
+			protected var _pageOrder:ArrayCollection;
+
+			public static function Open(className:Class):WizardBase {
+				var wizard:WizardBase = DialogFixed.Open(className, true) as WizardBase;
+				return wizard;
+			}
+
+			public function CreateWizardPage(className:Class):WizardPage {
+				var page:WizardPage = new className();
+				AddWizardPage(page);
+				return page;
+			}
+
+			public function AddWizardPage(page:WizardPage):void {
+				page.ParentWizard = this;
+				page.setStyle("left", 0);
+				page.setStyle("right", 0);
+				page.setStyle("top", 0);
+				page.setStyle("bottom", 0);
+				page.addEventListener(WizardPage.EVENT_PROCEEDCOMPLETE, OnProceedComplete);
+				page.addEventListener(WizardPage.EVENT_PROCEEDABORT, OnProceedAbort);
+				pages.addChild(page);
+				if (_pageOrder == null) {
+					_pageOrder = new ArrayCollection();
+					_pageOrder.addItem(page);
+					ShowWizardPage(page);
+				}
+			}
+
+			protected function ShowWizardPage(page:WizardPage):void {
+				(pages.selectedChild as WizardPage).Hide();
+				pages.selectedChild = page;
+				callLater(function(wizard:WizardBase):void {
+					ToggleButtons();
+					page.Show();
+				}, [this]);
+			}
+
+			private function ToggleButtons():void {
+				btnPrevious.enabled = (pages.selectedIndex != 0);
+				btnNext.enabled = true;
+				btnClose.enabled = true;
+			}
+
+			protected function OnProceedComplete(event:GenericEvent):void {
+				var nextPage:WizardPage = event.Tag() as WizardPage;
+				if (nextPage != null) {
+					var currentIndex:int = _pageOrder.getItemIndex(pages.selectedChild);
+					while (_pageOrder.length > currentIndex + 1) {
+						pages.removeChild(_pageOrder.getItemAt(currentIndex + 1) as DisplayObject);
+						_pageOrder.removeItemAt(currentIndex + 1);
+					}
+					_pageOrder.addItem(nextPage);
+					ShowWizardPage(nextPage);
+					callLater(function():void {
+						lblMask.visible = false;
+						pages.visible = true;
+					});
+				}
+				else {
+					dispatchEvent(new GenericEvent(EVENT_WIZARDFINISH, null));
+					Close();
+				}
+			}
+
+			protected function OnProceedAbort(event:GenericEvent):void {
+				callLater(function():void {
+					lblMask.visible = false;
+					pages.visible = true;
+					ToggleButtons();
+				});
+			}
+
+			protected function OnNext():void {
+				var currentPage:WizardPage = pages.selectedChild as WizardPage;
+				var currentIndex:int = _pageOrder.getItemIndex(currentPage);
+				if (currentPage.Dirty) {
+					var message:String = currentPage.BeginProceed();
+					if (message == "") {
+						message = "Loading...";
+					}
+					lblMask.text = message;
+					lblMask.visible = true;
+					pages.visible = false;
+					btnPrevious.enabled = false;
+					btnNext.enabled = false;
+					btnClose.enabled = false;
+				}
+				else {
+					ShowWizardPage(_pageOrder[currentIndex + 1]);
+				}
+			}
+
+			protected function OnPrevious():void {
+				var currentPage:WizardPage = pages.selectedChild as WizardPage;
+				var currentIndex:int = _pageOrder.getItemIndex(currentPage);
+				ShowWizardPage(_pageOrder[currentIndex - 1]);
+			}
+
+			protected function OnCancel():void {
+				for (var i:int = _pageOrder.length - 1; i >= 0; i--) {
+					var page:WizardPage = _pageOrder[i] as WizardPage;
+					page.Cancel();
+				}
+				dispatchEvent(new GenericEvent(EVENT_WIZARDCANCEL, null));
+				Close();
+			}
+		]]>
+	</mx:Script>
+	<mx:Canvas id="content" left="0" right="0" top="0" bottom="0" borderStyle="solid" borderSides="bottom">
+		<mx:ViewStack id="pages" left="0" right="0" top="0" bottom="0"/>
+	</mx:Canvas>
+	<mx:Label text="Loading..." horizontalCenter="0" verticalCenter="0" fontWeight="bold" id="lblMask" visible="false"/>
+	<ControlBarResizable id="ctrlBar" x="0" y="256" paddingTop="6">
+		<mx:Canvas width="100%">
+			<mx:Button label="&lt; Previous" right="147" id="btnPrevious" enabled="false" click="OnPrevious()"/>
+			<mx:Button label="Next &gt;" right="74" id="btnNext" click="OnNext()"/>
+			<mx:VRule top="0" bottom="0" right="64"/>
+			<mx:Button label="Close" id="btnClose" right="0" click="OnCancel()"/>
+		</mx:Canvas>
+	</ControlBarResizable>
+</DialogFixed>

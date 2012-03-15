@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:dtsui="DTS.UI.*" implements="mx.controls.listClasses.IDropInListItemRenderer" horizontalScrollPolicy="off" resize="OnResize()">
+	<mx:Script>
+		<![CDATA[
+			import mx.controls.DataGrid;
+			import mx.controls.listClasses.BaseListData;
+
+			private var _listData:BaseListData = null;
+
+			public function get listData():BaseListData {
+				return _listData;
+			}
+
+			public function set listData(value:BaseListData):void {
+				_listData = value;
+			}
+
+			public function get selectable():Boolean {
+				if (lblData != null) {
+					return lblData.selectable;
+				}
+				return false;
+			}
+
+			public function set selectable(value:Boolean):void {
+				if (lblData == null) {
+					callLater(function(v:Boolean):void {
+						selectable = v;
+					}, [value]);
+					return;
+				}
+				lblData.selectable = value;
+			}
+
+			override public function set data(value:Object):void {
+				super.data = value;
+				if (value != null) {
+					lblData.text = _listData.label;
+				}
+				else {
+					lblData.text = "";
+				}
+				callLater(function():void {
+					OnResize();
+				});
+			}
+
+			private function OnResize():void {
+				var p:Point = new Point(0, 0);
+				var xOffset:Number = lblData.localToGlobal(p).x - localToGlobal(p).x;
+				if (lblData.getExplicitOrMeasuredWidth() + xOffset > width && lblData.text != null && lblData.text.match(/^\s*$/) == null) {
+					lblData.toolTip = lblData.text;
+				}
+				else {
+					lblData.toolTip = null;
+				}
+			}
+		]]>
+	</mx:Script>
+	<dtsui:LabelInternational id="lblData" verticalCenter="0" paddingLeft="5"/>
+</mx:Canvas>

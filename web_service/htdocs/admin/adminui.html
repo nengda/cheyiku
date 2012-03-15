@@ -1,0 +1,31 @@
+<%flags>
+    inherit => 'base.mas'
+</%flags>
+
+<%attr>
+    admin_only => 1
+</%attr>
+
+<%args>
+</%args>
+
+<%once>
+</%once>
+
+<%init>
+</%init>
+
+<%method title>管理员工具</%method>
+<%method style>
+    html { overflow: hidden; }
+</%method>
+
+<div class="dts-full-screen">
+    <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" id="main" width="100%" height="100%">
+        <param name="movie" value="AdminUI.swf" />
+        <param name="quality" value="high" />
+        <param name="wmode" value="transparent" />
+        <param name="allowScriptAccess" value="sameDomain" />
+        <embed src="AdminUI.swf" quality="high" width="100%" height="100%" name="main" align="middle" play="true" loop="false" quality="high" wmode="transparent" allowScriptAccess="sameDomain" type="application/x-shockwave-flash"></embed>
+    </object>
+</div>

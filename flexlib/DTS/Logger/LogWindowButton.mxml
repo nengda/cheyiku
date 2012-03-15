@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dtsui:DialogFixed xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:dtsui="DTS.UI.*" layout="absolute" title="Log Messages" borderAlpha="0.95" borderColor="#EEEEEE" backgroundColor="#EEEEEE" backgroundAlpha="0.95">
+	<mx:Script>
+		<![CDATA[
+			private static var _instance:LogWindowButton = null;
+			public static function Open(logWindow:LogWindow):LogWindowButton {
+				var dlg:LogWindowButton = DialogFixed.Open(LogWindowButton, false, false) as LogWindowButton;
+				dlg.data = logWindow;
+				return dlg;
+			}
+		]]>
+	</mx:Script>
+	<dtsui:creationComplete>
+		<![CDATA[
+			this.x = this.stage.width - this.width - 10;
+			this.y = 10;
+		]]>
+	</dtsui:creationComplete>
+	<mx:LinkButton y="0" label="Show" left="0" right="0" color="#666666">
+		<mx:click>
+			<![CDATA[
+				var logWindow:LogWindow = this.data as LogWindow;
+				logWindow.visible = true;
+				Close();
+			]]>
+		</mx:click>
+	</mx:LinkButton>
+	<mx:ControlBar paddingTop="0"/>
+</dtsui:DialogFixed>

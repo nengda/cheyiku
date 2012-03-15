@@ -1,0 +1,49 @@
+use CYC::Database::MainDB;
+
+use Log::Log4perl;
+my $_logger = Log::Log4perl::get_logger(__PACKAGE__);
+
+sub admin_only {
+    return 1;
+}
+
+sub process_request {
+    my ($self, $r, $args) = @_;
+    my $clients = [];
+    my $sth = CYC::Database::MainDB->connect()->prepare(qq/
+        SELECT 
+            cyc_client.id as id,
+            cyc_client.full_name as full_name,
+            cyc_client.email as email,
+            cyc_client.sex as sex,
+            cyc_client.mobile_number as mobile_number,
+            cyc_client.license as license,
+            cyc_client.year_of_purchase as year_of_purchase,
+            cyc_client.mileage as mileage,
+            cyc_client.has_come as has_come,
+            convert_tz(cyc_client.create_timestamp, 'SYSTEM', '+00:00') as create_timestamp,
+            convert_tz(cyc_client.update_timestamp, 'SYSTEM', '+00:00') as update_timestamp,
+            cyc_car.model as car_model,
+            cyc_car.brand as car_brand,
+            cyc_profession.name as profession,
+            cyc_promoter.full_name as promoter,
+            cyc_district.name as district,
+            GROUP_CONCAT(cyc_service.name SEPARATOR ',') as services
+        FROM cyc_client
+            LEFT JOIN cyc_promoter ON cyc_client.promoter_id = cyc_promoter.id
+            JOIN cyc_district ON cyc_client.district_id = cyc_district.id
+            JOIN cyc_profession ON cyc_client.profession_id = cyc_profession.id
+            JOIN cyc_car ON cyc_client.car_id = cyc_car.id
+            LEFT JOIN cyc_service_interest ON cyc_client.id = cyc_service_interest.client_id
+            LEFT JOIN cyc_service ON cyc_service.id = cyc_service_interest.service_id
+        WHERE cyc_client.is_deleted = 0
+        GROUP BY cyc_client.id
+    /);
+    $sth->execute();
+
+    while (my $r = $sth->fetchrow_hashref) {
+        $r->{services} = "" unless $r->{services};
+        push @$clients, { client => $r };
+    }
+    return $clients;
+}

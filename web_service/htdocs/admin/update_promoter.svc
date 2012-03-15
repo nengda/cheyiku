@@ -1,0 +1,52 @@
+use CYC::Web::Model::Promoter;
+use CYC::Web::HandlerFault;
+use DateTime;
+use Digest::SHA1 qw/sha1_hex/;
+
+use Log::Log4perl;
+my $_logger = Log::Log4perl::get_logger(__PACKAGE__);
+
+sub admin_only {
+    return 1;
+}
+
+sub args {
+    return {
+        id => 0,
+        email => 1,
+        full_name => 1,
+        club => 1,
+        sex => 1,
+        mobile_number => 1,
+        description => 1,
+        id_prefix => 0,
+    };
+}
+
+
+sub process_request {
+    my ($self, $r, $args) = @_;
+    my $promoter;
+    if ($args->{id}) {
+        $promoter = CYC::Web::Model::Promoter->new(id => $args->{id})->load;
+        $promoter->full_name($args->{full_name});
+        $promoter->email($args->{email});
+        $promoter->club($args->{club});
+        $promoter->sex($args->{sex});
+        $promoter->mobile_number($args->{mobile_number});
+        $promoter->description($args->{description});
+        $promoter->update_timestamp(DateTime->now());
+        $promoter->save();
+    } else{
+        # new promoter
+        die CYC::Web::HandlerFault->new(message => "Invalid prefix", displayable => 1) if $args->{id_prefix} !~ /^[A-Za-z0-9]{2}$/;
+
+        $args->{create_timestamp} = DateTime->now();
+        $args->{update_timestamp} = DateTime->now();
+        $args->{is_deleted} = 0;
+        $args->{id} = ($args->{id_prefix} . substr(sha1_hex($args->{email} . $args->{create_timestamp}->iso8601()), 0, 6));
+        $args->{created_by} = $self->user()->email;
+        CYC::Web::Model::Promoter->new(%$args)->save();
+    }
+    return 'Success';
+}

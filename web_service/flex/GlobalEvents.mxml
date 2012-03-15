@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:UIComponent xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="OnCreationComplete()">
+	<mx:Metadata>
+		[Event(name="RefreshProcessorTasks", type="DTS.Core.GenericEvent")]
+		[Event(name="RefreshProcessorProcesses", type="DTS.Core.GenericEvent")]
+		[Event(name="RefreshProcessorHosts", type="DTS.Core.GenericEvent")]
+		[Event(name="RefreshProcessorInstances", type="DTS.Core.GenericEvent")]
+		[Event(name="RefreshProcessorEvents", type="DTS.Core.GenericEvent")]
+		[Event(name="RefreshNotifications", type="DTS.Core.GenericEvent")]
+		[Event(name="RefreshIDMUsers", type="DTS.Core.GenericEvent")]
+		[Event(name="RefreshTools", type="DTS.Core.GenericEvent")]
+		[Event(name="RefreshConfigurations", type="DTS.Core.GenericEvent")]
+	</mx:Metadata>
+	<mx:Script>
+		<![CDATA[
+			import DTS.Core.GenericEvent;
+			
+			import mx.core.Application;
+
+			public static const REFRESH_USERS:String = "RefreshUsers";
+			public static const REFRESH_PROMOTERS:String = "RefreshPromoters";
+			public static const REFRESH_CLIENTS:String = "RefreshClients";
+
+			private static var _instance:GlobalEvents = null;
+
+			public static function AddEventHandler(type:String, handler:Function):void {
+				if (_instance == null) {
+					Application.application.callLater(AddEventHandler, [type, handler]);
+					return;
+				}
+				_instance.addEventListener(type, handler);
+			}
+
+			public static function FireEvent(type:String, tag:Object=null):void {
+				_instance.dispatchEvent(new GenericEvent(type, tag));
+			}
+
+			private function OnCreationComplete():void {
+				_instance = this;
+			}
+		]]>
+	</mx:Script>
+</mx:UIComponent>

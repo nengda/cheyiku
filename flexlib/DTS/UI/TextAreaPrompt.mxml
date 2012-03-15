@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DialogFixed xmlns="DTS.UI.*" xmlns:mx="http://www.adobe.com/2006/mxml" width="450" height="350" borderThicknessLeft="0" borderThicknessRight="0" layout="absolute" horizontalScrollPolicy="off" verticalScrollPolicy="off">
+	<mx:Script>
+		<![CDATA[
+			[Bindable]
+			private var _hint:String = null;
+
+			[Bindable]
+			private var _value:String = null;
+
+			private var _onValidate:Function = null;
+			private var _onComplete:Function = null;
+			private var _onCancel:Function = null;			
+
+			public static function Open(title:String, hint:String, value:String, onValidate:Function, onComplete:Function, onCancel:Function=null):TextAreaPrompt {
+				var dlg:TextAreaPrompt = DialogFixed.Open(TextAreaPrompt) as TextAreaPrompt;
+				dlg.title = title;
+				dlg._hint = hint;
+				dlg._value = value;
+				dlg._onValidate = onValidate;
+				dlg._onComplete = onComplete;
+				dlg._onCancel = onCancel;
+				return dlg;
+			}
+		]]>
+	</mx:Script>
+	<GradientCanvas left="0" right="0" height="19" borderStyle="solid" borderSides="top" fillColors="[#EEEEEE, #FFFFFF]" fillAlphas="[1, 1]" horizontalScrollPolicy="off" verticalScrollPolicy="off">
+		<mx:Label id="lblHint" text="{_hint}" x="3" color="#666666" y="2"/>
+	</GradientCanvas>
+	<mx:TextArea id="txtInput" text="{_value}" borderSides="bottom" left="0" right="0" top="18" bottom="0" paddingLeft="3" paddingRight="3" paddingTop="0" paddingBottom="2" focusThickness="0">
+		<mx:creationComplete>
+			<![CDATA[
+				txtInput.setFocus();
+			]]>
+		</mx:creationComplete>
+	</mx:TextArea>
+	<ControlBarResizable horizontalAlign="right" paddingTop="8" WindowMinWidth="320" WindowMinHeight="200">
+		<mx:Button label="OK">
+			<mx:click>
+				<![CDATA[
+					if (_onValidate(txtInput.text) == true) {
+						_onComplete(txtInput.text);
+						Close();
+					}
+				]]>
+			</mx:click>
+		</mx:Button>
+		<mx:Button label="Cancel">
+			<mx:click>
+				<![CDATA[
+					if (_onCancel != null) {
+						_onCancel();
+					}
+					Close();
+				]]>
+			</mx:click>
+		</mx:Button>
+	</ControlBarResizable>
+</DialogFixed>

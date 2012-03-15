@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="450" height="230" borderAlpha="0.95" borderColor="#EEDDDD" backgroundColor="#EEDDDD" backgroundAlpha="0.95" creationComplete="OnCreationComplete()">
+	<mx:Script>
+		<![CDATA[
+			import mx.core.Application;
+			import mx.core.IFlexDisplayObject;
+			import mx.managers.PopUpManager;
+
+			private static var _dlg:BouncerInstructionsDialog = null;
+
+			public static function Open():BouncerInstructionsDialog {
+				if (_dlg == null) {
+					var app:Application = Application.application as Application;
+					_dlg = PopUpManager.createPopUp(app, BouncerInstructionsDialog, true) as BouncerInstructionsDialog;
+				}
+				else {
+					PopUpManager.bringToFront(_dlg);
+				}
+				PopUpManager.centerPopUp(_dlg);
+				return _dlg;
+			}
+
+			public static function get Instance():BouncerInstructionsDialog {
+				return _dlg;
+			}
+			
+			private function OnCreationComplete():void {
+				lblInst.htmlText = 
+					'<font color="#ff0000" size="11"><b>Your backyard session has expired.</b></font><br>' + 
+					'<br>' + 
+					'<b>Please follow the steps below to re-login:</b><br>' + 
+					'1. Keep this page open and open a new <u>tab</u> in your current web browser.<br>' + 
+					'2. In the new tab, visit "https://gh.bouncer.login.yahoo.com/login".<br>' + 
+					'3. Enter your user ID and password to login.<br>' + 
+					'4. Verify that you have logged in successfully.<br>' + 
+					'5. Switch back to this page and click the "Continue" button below.<br>' + 
+					'<br>' + 
+					'If the problem persists, please <a href="mailto:ysm-dts-monkeys@yahoo-inc.com">contact</a> DTS for assistance.';
+			}
+
+			private function Close():void {
+				callLater(function(dlg:IFlexDisplayObject):void {
+					_dlg = null;
+					PopUpManager.removePopUp(dlg);
+				}, [this]);
+			}
+		]]>
+	</mx:Script>
+	<mx:Text id="lblInst" left="0" top="0" bottom="0" right="0"/>
+	<mx:ControlBar>
+		<mx:Button label="I have completed the above steps" width="100%" click="Close()"/>
+	</mx:ControlBar>
+</mx:TitleWindow>

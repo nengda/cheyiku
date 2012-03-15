@@ -1,0 +1,19 @@
+use CYC::Web::Model::Promoter;
+
+sub admin_only {
+    return 1;
+}
+
+sub args {
+    return {
+        id => 1,
+    };
+}
+
+sub process_request {
+    my ($self, $r, $args) = @_;
+    my $promoter = CYC::Web::Model::Promoter->new(id => $args->{id})->load;
+    $promoter->is_deleted(1);
+    $promoter->save();
+    return 'Success';
+}

@@ -1,0 +1,64 @@
+use CYC::Web::Model::Client;
+use CYC::Web::Model::ServiceInterest;
+use CYC::Database::MainDB;
+use DateTime;
+use Digest::SHA1 qw/sha1_hex/;
+
+sub admin_only {
+    return 1;
+}
+
+sub args {
+    return {
+        id => 0,
+        full_name => 1,
+        email => 1,
+        sex => 1,
+        mobile_number => 1,
+        car_id => 1,
+        profession_id => 1,
+        district_id => 1,
+        license => 1,
+        year_of_purchase => 1,
+        mileage => 1,
+        service_ids => 1,
+    };
+}
+
+
+sub process_request {
+    my ($self, $r, $args) = @_;
+    my $client;
+    if (defined $args->{id}) {
+        $client = CYC::Web::Model::Client->new(id => $args->{id})->load;
+        $client->full_name($args->{full_name});
+        $client->email($args->{email});
+        $client->sex($args->{sex});
+        $client->mobile_number($args->{mobile_number});
+        $client->car_id($args->{car_id});
+        $client->profession_id($args->{profession_id});
+        $client->district_id($args->{district_id});
+        $client->license($args->{license});
+        $client->year_of_purchase($args->{year_of_purchase});
+        $client->mileage($args->{mileage});
+        $client->update_timestamp(DateTime->now());
+        $client->save();
+
+        # clear old service interests
+        my $dbh = CYC::Database::MainDB->connect();
+        my $sth = $dbh->prepare("delete from cyc_service_interest where client_id = ?");
+        $sth->execute($args->{id});
+    } else {
+        $args->{create_timestamp} = DateTime->now();
+        $args->{update_timestamp} = DateTime->now();
+        $args->{id} = ("--" . substr(sha1_hex($args->{email} . $args->{create_timestamp}->iso8601()), 0, 8));
+        $args->{is_deleted} = 0;
+        $client = CYC::Web::Model::Client->new(%$args)->save();
+    }
+    
+    my @service_ids = split ",", $args->{service_ids};
+    for my $id (@service_ids) {
+        CYC::Web::Model::ServiceInterest->new(service_id => $id, client_id => $client->id)->save();
+    }
+    return 'Success';
+}

@@ -1,0 +1,4 @@
+CYCWeb:
+    CacheCompiledCode: $(WebService_CacheCompiledCode)
+    DefaultLogLevel: $(WebService_DefaultLogLevel)
+    SessionExpireTime: $(WebService_SessionExpireTime)

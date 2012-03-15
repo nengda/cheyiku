@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns="*" xmlns:mx="http://www.adobe.com/2006/mxml" label="推广人" creationComplete="OnCreationComplete()">
+	<mx:Script>
+		<![CDATA[
+			import DTS.Core.GenericEvent;
+			import DTS.Net.HTTPClient;
+			import DTS.UI.BlockingWindow;
+			import DTS.UI.DataGridClasses.FilterableHeader;
+			import DTS.UI.DataGridClasses.FilterPanels.FilterPanelBase;
+			import DTS.UI.DataGridClasses.FilterPanels.FilterPanelString;
+			import DTS.UI.DataGridClasses.FilterPanels.FilterPanelEnum;
+			import DTS.UI.DataGridClasses.FilterPanels.FilterPanelDate;
+			import DTS.UI.Colors;
+			import DTS.Utilities.DataGridColumns;
+			import DTS.Utilities.ListDoubleClick;
+			import mx.collections.XMLListCollection;
+			import mx.events.ListEvent;
+			import mx.skins.ProgrammaticSkin;
+
+			private static var _instance:PromoterPage = null;
+			public static function get Instance():PromoterPage {
+				return _instance;
+			}
+
+			protected var _filterPanels:Array = null;
+			
+			private function OnCreationComplete():void {
+				_instance = this;
+				GlobalEvents.AddEventHandler(GlobalEvents.REFRESH_PROMOTERS, function(event:GenericEvent):void {
+					Refresh();
+				});
+				Refresh();
+			}
+			
+			public function Refresh():void {
+				if (pnlLoading == null) {
+					callLater(Refresh);
+					return;
+				}
+
+				if (pnlLoading.visible) {
+					return;
+				}
+
+				pnlLoading.visible = true;
+				HTTPClient.Post(
+					"PromoterPage",
+					Settings.EndPoint + "list_promoters.svc",
+					{},
+					function(response:String):void {
+						pnlLoading.visible = false;
+						var xmlPro:XML = XML(response);
+						var promoters:XMLList = xmlPro.data.promoter;
+						var dp:XMLListCollection = new XMLListCollection(promoters);
+						dp.filterFunction = FilterFunction;
+						dp.refresh();
+						dgPromoters.dataProvider = dp;
+					},
+					function():void {
+						pnlLoading.visible = false;
+					}
+				);
+			}
+
+			private function FilterFunction(o:Object):Boolean {
+				for each (var fp:FilterPanelBase in _filterPanels) {
+					if (!fp.Filter(o)) {
+						return false;
+					}
+				}
+				return true;
+			}
+
+			private function OnFilterChanged(event:Event=null):void {
+				callLater(function():void {
+					var dp:XMLListCollection = dgPromoters.dataProvider as XMLListCollection;
+					if (dp != null) {
+						dp.refresh();
+						dgPromoters.invalidateList();
+					}
+				});
+			}
+
+			private function InitDataGrid():void {
+				var columns:Array = new Array();
+				_filterPanels = new Array();
+				AddColumn(columns, _filterPanels,
+					{headerText: "邀请码", width: 80, dataField: "id"},
+					new FilterPanelString("id", OnFilterChanged)
+				);
+				AddColumn(columns, _filterPanels,
+					{headerText: "创建人", width: 80, dataField: "created_by"},
+					new FilterPanelString("created_by", OnFilterChanged)
+				);
+				AddColumn(columns, _filterPanels,
+					{headerText: "客户数", width: 80, dataField: "client_count"},
+					new FilterPanelString("client_count", OnFilterChanged)
+				);
+				AddColumn(columns, _filterPanels,
+					{headerText: "姓名", width: 80, dataField: "full_name"},
+					new FilterPanelString("full_name", OnFilterChanged)
+				);
+				AddColumn(columns, _filterPanels,
+					{headerText: "俱乐部", dataField: "club"},
+					new FilterPanelString("club", OnFilterChanged)
+				);
+				AddColumn(columns, _filterPanels,
+					{headerText: "邮箱", dataField: "email"},
+					new FilterPanelString("email", OnFilterChanged)
+				);
+				AddColumn(columns, _filterPanels,
+					{headerText: "手机号码", dataField: "mobile_number"},
+					new FilterPanelString("mobile_number", OnFilterChanged)
+				);
+				AddColumn(columns, _filterPanels,
+					{headerText: "创建时间", dataField: "create_timestamp", datetime: true},
+					new FilterPanelDate("create_timestamp", OnFilterChanged)
+				);
+				AddColumn(columns, _filterPanels,
+					{headerText: "更新时间", dataField: "update_timestamp", datetime: true},
+					new FilterPanelDate("update_timestamp", OnFilterChanged)
+				);
+				AddColumn(columns, _filterPanels,
+					{headerText: "", dataField: "", width: 60, resizable: false, sortable: false, itemRenderer: {
+						rendererClass: PromoterActions, properties: { IsItemHighlighted: dgPromoters.isItemHighlighted }
+					}}
+				);
+				DataGridColumns.Create(dgPromoters, columns);
+				ListDoubleClick.OnItemDoubleClicked(dgPromoters, function(item:Object):void {
+					var xml:XML = item as XML;
+					switch (xml.localName().toString().toLowerCase()) {
+						case "promoter":
+							PromoterEditor.Open(xml);
+							break;
+					}
+				});
+			}
+
+			private function AddColumn(columns:Array, filterPanels:Array, c:Object, f:FilterPanelBase=null):void {
+				if (f != null) {
+					c["headerRenderer"] = {
+						rendererClass: FilterableHeader,
+						properties: { FilterPanel: f }
+					};
+					filterPanels.push(f);
+				}
+				columns.push(c);
+			}
+
+			private function OnItemRollOver(event:ListEvent):void {
+				try {
+					PromoterActions.ItemToInstance(event.itemRenderer.data).alpha = 1;
+				}
+				catch (error:Error) {}
+			}
+
+			private function OnItemRollOut(event:ListEvent):void {
+				try {
+					PromoterActions.ItemToInstance(event.itemRenderer.data).alpha = 0;
+				}
+				catch (error:Error) {}
+			}
+		]]>
+	</mx:Script>
+	<mx:DataGrid id="dgPromoters" left="0" right="0" top="0" bottom="36" borderSides="top" rowHeight="24" allowMultipleSelection="false" alternatingItemColors="[#FFFFFF, #FFFFFF]" horizontalGridLines="false" verticalGridLines="false" creationComplete="InitDataGrid()" itemRollOver="OnItemRollOver(event)" itemRollOut="OnItemRollOut(event)"/>
+	<mx:Canvas id="pnlLoading" left="10" bottom="46" borderStyle="solid" borderThickness="0" backgroundColor="{Colors.THEME_COLOR}" cornerRadius="5" visible="false" backgroundAlpha="0.8">
+		<mx:Label text="加载中..." color="#FFFFFF" fontWeight="bold" left="10" right="10" top="5" bottom="5"/>
+	</mx:Canvas>
+	<mx:Canvas height="36" borderSides="top" borderStyle="solid" bottom="0" left="0" right="0" backgroundColor="#EEEEEE">
+		<mx:HBox verticalCenter="0" verticalAlign="middle" right="10" horizontalGap="0">
+			<mx:Button id="btnAdd" label="新推广人" icon="{Icons.ICO_ADD}" skin="mx.skins.ProgrammaticSkin">
+				<mx:click>
+					<![CDATA[
+						PromoterEditor.Open(XML(<promoter/>));
+					]]>
+				</mx:click>
+				<mx:mouseOver>
+					<![CDATA[
+						btnAdd.setStyle("textDecoration", "underline");
+					]]>
+				</mx:mouseOver>
+				<mx:mouseOut>
+					<![CDATA[
+						btnAdd.setStyle("textDecoration", "none");
+					]]>
+				</mx:mouseOut>
+			</mx:Button>
+			<mx:Button id="btnRefresh" label="刷新" icon="{Icons.ICO_REFRESH}" skin="mx.skins.ProgrammaticSkin" click="Refresh()">
+				<mx:mouseOver>
+					<![CDATA[
+						btnRefresh.setStyle("textDecoration", "underline");
+					]]>
+				</mx:mouseOver>
+				<mx:mouseOut>
+					<![CDATA[
+						btnRefresh.setStyle("textDecoration", "none");
+					]]>
+				</mx:mouseOut>
+			</mx:Button>
+		</mx:HBox>
+	</mx:Canvas>
+</mx:Canvas>

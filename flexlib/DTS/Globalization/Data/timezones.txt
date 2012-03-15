@@ -1,0 +1,285 @@
+ Afghanistan 	1 	UTC+4:30
+ Albania 	1 	UTC+1 (CET)
+ Algeria 	1 	UTC+1 (CET)
+ Andorra 	1 	UTC+1 (CET)
+ Angola 	1 	UTC+1 (WAT)
+ Antigua and Barbuda 	1 	UTC-4 (AST)
+ Argentina 	1 	UTC-3 (ART)
+ Armenia 	1 	UTC+4
+ Australia 	7 	UTC+5 — Heard and McDonald Islands
+UTC+6:30 — Cocos (Keeling) Islands
+UTC+7 (CXT) — Christmas Island
+UTC+8 (AWST) — Western Australia
+UTC+9:30 (ACST) — Southern Australia, Northern Territory
+UTC+10 (AEST) — Queensland, New South Wales, Australian Capital Territory, Victoria, Tasmania
+UTC+11:30 (NFT)— Norfolk Island
+See Time in Australia
+ Austria 	1 	UTC+1 (CET)
+ Azerbaijan 	1 	UTC+4
+ Bahamas 	1 	UTC-5 (EST)
+ Bahrain 	1 	UTC+3
+ Bangladesh 	1 	UTC+6 (BDT)
+ Barbados 	1 	UTC-4
+ Belarus 	1 	UTC+2 (EET)
+ Belgium 	1 	UTC+1 (CET)
+See Time in Belgium
+ Belize 	1 	UTC-6
+ Benin 	1 	UTC+1 (WAT)
+ Bhutan 	1 	UTC+6 (BTT)
+ Bolivia 	1 	UTC-4
+ Bosnia and Herzegovina 	1 	UTC+1 (CET)
+ Botswana 	1 	UTC+2 (CAT)
+ Brazil 	3 	UTC-4 (Brasilia time - 1) — Amazonas, Mato Grosso, Mato Grosso do Sul, Rondonia, Roraima, Acre
+UTC-3 (Brasilia time) — the Southeast Region, the South Region, the Northeast Region (except some islands), Goias, Distrito Federal, Tocantins, Para, Amapa
+UTC-2 (Brasilia time + 1) — few islands on the east coast of Brazil (Fernando de Noronha, Trindade, Martin Vaz, Atol das Rocas, Saint Peter and Paul Rocks)
+See Time in Brazil
+ Brunei 	1 	UTC+8
+ Bulgaria 	1 	UTC+2 (EET)
+ Burkina Faso 	1 	UTC (GMT)
+ Burma 	1 	UTC+6:30 (Myanmar Time)
+ Burundi 	1 	UTC+2 (CAT)
+ Cambodia 	1 	UTC+7
+ Cameroon 	1 	UTC+1 (WAT)
+ Canada 	6 	UTC-8 (PST) — larger western part of British Columbia, Tungsten and the associated Cantung Mine in Northwest Territories, Yukon
+UTC-7 (MST) — Alberta, some eastern parts of British Columbia, most of Northwest Territories, Nunavut (west of 102°W and all communities in the Kitikmeot Region), Lloydminster and surrounding area in Saskatchewan
+UTC-6 (CST) — Manitoba, Nunavut (between 85° West and 102°W except western Southampton Island), Ontario (Northwestern Ontario west of 90°W with some exceptions and Big Trout Lake area east of 90°W), Saskatchewan except Lloydminster
+UTC-5 (EST) — Nunavut east of 85°W and entire Southampton Island, Ontario east of 90°W (except Big Trout Lake area) plus several more western areas, Quebec (most of province)
+UTC-4 (AST) — Labrador (all but southeastern tip), New Brunswick, Nova Scotia, Prince Edward Island, eastern part of Quebec
+UTC-3:30 (NST) — Labrador (southeastern), Newfoundland
+See Time in Canada
+ Cape Verde 	1 	UTC-1 (Cape Verde Time)
+ Central African Republic 	1 	UTC+1 (WAT)
+ Chad 	1 	UTC-1 (Cape Verde Time)
+ Chile 	2 	UTC-6 — Easter Island
+UTC-4 — main territory
+See Time in Chile
+ China 	1 	UTC+8 (Chinese Standard Time)
+See also: Time in China, Hong Kong Time and Macau Standard Time
+ Colombia 	1 	UTC-5
+ Comoros 	1 	UTC+3 (EAT)
+ Costa Rica 	1 	UTC-6
+ Cote d'Ivoire 	1 	UTC (GMT)
+ Croatia 	1 	UTC+1 (CET)
+ Cuba 	1 	UTC-5
+ Cyprus 	1 	UTC+2 (EET)
+ Czech Republic 	1 	UTC+1 (CET)
+ Democratic Republic of the Congo 	2 	UTC+1 (WAT) — western part of the country
+UTC+2 (CAT) — eastern part of the country
+ Denmark 	5 	UTC-4 — northwestern Greenland
+UTC-3 — most of Greenland, including inhabited south coast and southwest coast
+UTC-1 — Ittoqqortoormiit and surrounding area in Greenland's Tunu county
+UTC — (GMT) — Danmarkshavn weather station and surrounding area in Greenland's Tunu county, Faroe Islands
+UTC+1 — (CET) — metropolitain Denmark
+ Djibouti 	1 	UTC+3 (EAT)
+ Dominica 	1 	UTC-4
+ Dominican Republic 	1 	UTC-4
+ East Timor 	1 	UTC+9
+ Ecuador 	2 	UTC-6 (GALT) — Galápagos Province
+UTC-5 (Ecuador Time) — main territory of Equador
+ Egypt 	1 	UTC+2 (EET)
+ El Salvador 	1 	UTC-6
+ Equatorial Guinea 	1 	UTC+1 (WAT)
+ Eritrea 	1 	UTC+3 (EAT)
+ Estonia 	1 	UTC+2 (EET)
+ Ethiopia 	1 	UTC+3 (EAT)
+See Time in Ethiopia
+ Fiji 	1 	UTC+12
+ Finland 	1 	UTC+2 (EET)
+ France 	12 	UTC-10 — French Polynesia
+UTC-9:30 — French Polynesia
+UTC-9 — French Polynesia
+UTC-8 — Clipperton
+UTC-4 (AST) — Guadeloupe, Martinique, Saint Barthelemy, Saint Martin
+UTC-3 (PMST) — French Guiana, Saint Pierre and Miquelon
+UTC+1 (CET) — European France
+UTC+3 — Mayotte
+UTC+4 — Réunion
+UTC+5 — Kerguelen Islands
+UTC+11 — New Caledonia
+UTC+12 — Wallis and Futuna
+ Gabon 	1 	UTC+1 (WAT)
+ Gambia 	1 	UTC (GMT)
+ Georgia 	1 	UTC+4
+ Germany 	1 	UTC+1 (CET)
+See Time in Germany
+ Ghana 	1 	UTC (GMT)
+ Greece 	1 	UTC+2 (EET)
+ Grenada 	1 	UTC-4
+ Guatemala 	1 	UTC-6
+ Guinea 	1 	UTC (GMT)
+ Guinea-Bissau 	1 	UTC (GMT)
+ Guyana 	1 	UTC-4
+ Haiti 	1 	UTC-5
+ Honduras 	1 	UTC-6
+ Hong Kong 	1 	UTC+8 (HKT)
+ Hungary 	1 	UTC+1 (CET)
+ Iceland 	1 	UTC (GMT)
+ India 	1 	UTC+5:30 (IST)
+ Indonesia 	3 	UTC+7 (Indonesian Western Standard Time) — islands of Sumatra, Java, provinces of West Kalimantan and Central Kalimantan
+UTC+8 (Indonesian Central Standard Time) — islands of Sulawesi, Bali, provinces of East Nusa Tenggara, West Nusa Tenggara, East Kalimantan and South Kalimantan
+UTC+9 (Indonesian Eastern Standard Time) — provinces of Maluku, North Maluku, Papua and West Papua
+See Time in Indonesia
+ Iran 	1 	UTC+3:30 (IRST)
+ Iraq 	1 	UTC+3
+ Ireland 	1 	UTC (WET)
+ Israel 	1 	UTC+2 (IST)
+ Italy 	1 	UTC+1 (CET)
+ Jamaica 	1 	UTC-5
+ Japan 	1 	UTC+9 (JST)
+ Jordan 	1 	UTC+2
+ Kazakhstan 	2 	UTC+5 — western Kazakhstan
+UTC+6 — eastern Kazakhstan
+ Kenya 	1 	UTC+3 (EAT)
+See Time in Kenya
+ Kiribati 	3 	UTC+12 — Gilbert Islands
+UTC+13 — Phoenix Islands
+UTC+14 — Line Islands
+ Kosovo 	1 	UTC+1 (CET)
+ Kuwait 	1 	UTC+3 (Arabia Standard Time)
+ Kyrgyzstan 	1 	UTC+6
+ Laos 	1 	UTC+7
+ Latvia 	1 	UTC+2 (EET)
+ Lebanon 	1 	UTC+2 (EET)
+ Lesotho 	1 	UTC+2
+ Liberia 	1 	UTC (GMT)
+ Libya 	1 	UTC+2 (EET)
+ Liechtenstein 	1 	UTC+1 (CET)
+ Lithuania 	1 	UTC+2 (EET)
+ Luxembourg 	1 	UTC+1 (CET)
+ Macau 	1 	UTC+8 (Macau Standard Time)
+ Madagascar 	1 	UTC+3 (EAT)
+ Malawi 	1 	UTC+2 (CAT)
+ Malaysia 	1 	UTC+8 (Malaysian Standard Time)
+ Maldives 	1 	UTC+5
+ Mali 	1 	UTC (GMT)
+ Malta 	1 	UTC+1 (CET)
+ Marshall Islands 	1 	UTC+12
+ Mauritania 	1 	UTC (GMT)
+ Mauritius 	1 	UTC+4 (Mauritius Time)
+ Mexico 	3 	UTC-8 (Zone 3 or Northwest Zone) — the state of Baja California
+UTC-7 (Zone 2 or Pacific Zone) — the states of Baja California Sur, Chihuahua, Nayarit, Sinaloa and Sonora
+UTC-6 (Zone 1 or Central Zone) — most of Mexico
+See Time in Mexico
+ Micronesia 	2 	UTC+10 — the states of Chuuk and Yap
+UTC+11 — the states of Kosrae and Pohnpei
+ Moldova 	1 	UTC+2 (EET)
+ Monaco 	1 	UTC+1 (CET)
+ Mongolia 	2 	UTC+7 — the provinces of Khovd, Uvs and Bayan-Ölgii
+UTC+8 — most of the country
+ Montenegro 	1 	UTC+1 (CET)
+ Morocco 	1 	UTC (WET)
+ Mozambique 	1 	UTC+2 (CAT)
+ Namibia 	1 	UTC+1 (WAT)
+ Nauru 	1 	UTC+12
+ Nepal 	1 	UTC+5:45 (Nepal Time)
+ Netherlands 	2 	UTC-4 (AST) — Aruba and Netherlands Antilles
+UTC+1 (CET) — main territory of the Netherlands
+ New Zealand 	4 	UTC-11 — Niue
+UTC-10 — Cook Islands and Tokelau
+UTC+12 — main territory of New Zealand
+UTC+12:45 — Chatham Islands
+See Time in New Zealand
+ Nicaragua 	1 	UTC-6
+ Niger 	1 	UTC+1 (WAT)
+ Nigeria 	1 	UTC+1 (WAT)
+ North Korea 	1 	UTC+9 (Korea Standard Time)
+ Norway 	1 	UTC+1 (CET)
+See Time in Norway
+ Oman 	1 	UTC+4
+ Pakistan 	1 	UTC+5 (PST)
+ Palau 	1 	UTC+9
+ Panama 	1 	UTC-5
+ Papua New Guinea 	1 	UTC+10
+ Paraguay 	1 	UTC-4
+ Peru 	1 	UTC-5 (PET)
+ Philippines 	1 	UTC+8 (PHT)
+ Poland 	1 	UTC+1 (CET)
+ Portugal 	2 	UTC-1 — Azores
+UTC (WET) — Madeira and the main territory of Portugal
+ Qatar 	1 	UTC+3 (Arabia Standard Time)
+ Republic of Macedonia 	1 	UTC+1 (CET)
+ Republic of the Congo 	1 	UTC+1 (WAT)
+ Romania 	1 	UTC+2 (EET)
+ Russia 	11 	UTC+2 (Kaliningrad Time) — Kaliningrad Oblast
+UTC+3 (Moscow Time) — Most of European Russia and all railroads throughout Russia
+UTC+4 (Samara Time) — Samara Oblast and Udmurtia
+UTC+5 (Yekaterinburg Time) — Bashkortostan, Chelyabinsk Oblast, Khantia-Mansia, Kurgan Oblast, Orenburg Oblast, Perm Krai, Sverdlovsk Oblast, Tyumen Oblast, and Yamalia
+UTC+6 (Omsk Time) — Altai Krai, Altai Republic, Novosibirsk Oblast, Omsk Oblast and Tomsk Oblast
+UTC+7 (Krasnoyarsk Time) — Kemerovo Oblast, Khakassia, Krasnoyarsk Krai and Tuva
+UTC+8 (Irkutsk Time) — Buryatia and Irkutsk Oblast
+UTC+9 (Yakutsk Time) — Amur Oblast, western Sakha Republic and Zabaykalsky Krai
+UTC+10 (Vladivostok Time) — The Jewish Autonomous Oblast, Khabarovsk Krai, Primorsky Krai, central Sakha Republic and Sakhalin Island
+UTC+11 (Magadan Time) — Magadan Oblast, eastern Sakha and the Kuril Islands
+UTC+12 (Kamchatka Time) — Chukotka and Kamchatka Krai
+See Time in Russia
+ Rwanda 	1 	UTC+2 (CAT)
+ Saint Kitts and Nevis 	1 	UTC-4
+ Saint Lucia 	1 	UTC-4
+ Saint Vincent and the Grenadines 	1 	UTC-4
+ Samoa 	1 	UTC-11
+ San Marino 	1 	UTC+1 (CET)
+ Saudi Arabia 	1 	UTC+3 (Arabia Standard Time)
+ Senegal 	1 	UTC (GMT)
+ Serbia 	1 	UTC+1 (CET)
+ Seychelles 	1 	UTC+4 (Seychelles Time)
+ Sierra Leone 	1 	UTC (GMT)
+ Singapore 	1 	UTC+8 (SST)
+ Slovakia 	1 	UTC+1 (CET)
+ Slovenia 	1 	UTC+1 (CET)
+ Solomon Islands 	1 	UTC+11
+ Somalia 	1 	UTC+3 (EAT)
+ South Africa 	1 	UTC+2 (South African Standard Time)
+ South Korea 	1 	UTC+9 (Korea Standard Time)
+ Spain 	2 	UTC (WET) — Canary Islands
+UTC+1 — main territory of Spain
+ Sri Lanka 	1 	UTC+5:30 (SLT)
+ Sudan 	1 	UTC+3 (EAT)
+ Suriname 	1 	UTC-3
+ Swaziland 	1 	UTC+2
+ Sweden 	1 	UTC+1 (CET)
+ Switzerland 	1 	UTC+1 (CET)
+ Syria 	1 	UTC+2 (EET)
+ São Tomé and Príncipe 	1 	UTC (GMT)
+ Tajikistan 	1 	UTC+5
+ Tanzania 	1 	UTC+3 (EAT)
+ Thailand 	1 	UTC+7 (THA)
+See Time in Thailand
+ Togo 	1 	UTC (GMT)
+ Tonga 	1 	UTC+13
+ Trinidad and Tobago 	1 	UTC-4
+ Tunisia 	1 	UTC+1 (CET)
+ Turkey 	1 	UTC+2 (EET)
+ Turkmenistan 	1 	UTC+5
+ Tuvalu 	1 	UTC+12
+ Uganda 	1 	UTC+3 (EAT)
+ Ukraine 	1 	UTC+2 (EET)
+ United Arab Emirates 	1 	UTC+4
+ United Kingdom 	8 	UTC-8 — Pitcairn Islands
+UTC-5 — Cayman Islands, Turks and Caicos Islands
+UTC-4 (AST) — Anguilla, Bermuda, British Virgin Islands, Falkland Islands, Montserrat
+UTC-2 — South Georgia and the South Sandwich Islands
+UTC (GMT) — main territory of the United Kingdom, Saint Helena (with Ascension Island and Tristan da Cunha), Guernsey, Isle of Man, Jersey
+UTC+1 (CET) — Gibraltar
+UTC+2 (EET) — Akrotiri and Dhekelia
+UTC+6 — British Indian Ocean Territory
+See Time in the United Kingdom
+ United States 	9 	UTC-11 (SST) — American Samoa
+UTC-10 (HAST) — Hawaii and most of the length of the Aleutian Islands chain (west of 169°30'W)
+UTC-9 (AKST) — most of the state of Alaska
+UTC-8 (PST) — the states on the Pacific coast plus Nevada
+UTC-7 (MST) — the states that include the Rocky Mountains
+UTC-6 (CST) — Gulf Coast, Tennessee Valley, and Great Plains
+UTC-5 (EST) — the states on the Atlantic coast and the eastern two thirds of the Ohio Valley
+UTC-4 (AST) — Puerto Rico and the U.S. Virgin Islands
+UTC+10 (ChST) — Guam and the Northern Mariana Islands
+See Time in the United States
+ Uruguay 	1 	UTC-3
+ Uzbekistan 	1 	UTC+5 (Uzbekistan Time)
+ Vanuatu 	1 	UTC+11
+ Vatican City 	1 	UTC+1 (CET)
+ Venezuela 	1 	UTC-4:30
+See Time in Venezuela
+ Vietnam 	1 	UTC+7
+ Yemen 	1 	UTC+3
+ Zambia 	1 	UTC+2 (CAT)
+ Zimbabwe 	1 	UTC+2 (CAT)

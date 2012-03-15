@@ -1,0 +1,69 @@
+PRODUCT_NAME = cyc_core
+SRCDIRS=$(CYC_HOME)/core
+VERSION = `awk '/^[Vv]ersion/ {print $2; exit}' $(SRCDIRS)/README`
+SHORT_DESC = CYC Core
+LONG_DESC = `cat $(SRCDIRS)/README`
+CUSTODIAN = nengda.jin@gmail.com http://twiki.corp.yahoo.com/view/AdApps/SASTDTS
+PACKAGE_OS_SPECIFIC = no
+
+OWNER = yahoo
+GROUP = dev
+PERM = 0444
+
+YINST bug-product CYC
+YINST bug-component General
+
+#dir 0755 - - var/cyc_core
+#dir 0755 - - logs/cyc_core
+
+configfile 0644 - - conf/cyc_core.yml $(SRCDIRS)/conf/config.yml expand overwrite
+
+# All modules
+find - - - lib/perl5/site_perl/ $(SRCDIRS)/lib -name "*.pm" ! -regex '.*/.svn.*'
+
+# Include bin stuffs
+# find 0555 - - bin/ $(SRCDIRS)/bin -name "*.pl" ! -regex '.*/.svn.*'
+
+# Dir for test scripts
+# dir 0755 - - libexec/sast_dts_core
+
+# Include test lib files
+# find - - - libexec/sast_dts_core/lib/  $(SRCDIRS)/t/lib -type f -name "*.pm" ! -regex '.*/.svn.*'
+
+# Include all .t file under the <src_dir>/t directory
+# find - - - libexec/sast_dts_core/ $(SRCDIRS)/t -type f -name '*.t' ! -regex '.*/.svn.*'
+
+# Dir for libdata
+# dir 0755 - - libdata/sast_dts_core
+
+# Include data files in the libdata dir
+# find - - - libdata/sast_dts_core/ $(SRCDIRS)/libdata -type f ! -regex '.*/.svn.*'
+
+# Prerequisites
+YINST requires pkg perl 5.10.1_04 5.9999.9999
+YINST requires pkg ypan/perl-Archive-Zip 1.26_01 1.9999
+YINST requires pkg ypan/perl-Config-Auto 0.20_02 0.9999
+YINST requires pkg ypan/perl-DBI 1.609_01 1.9999
+YINST requires pkg ypan/perl-Data-Dumper 2.128_02 2.9999
+YINST requires pkg ypan/perl-DateTime-Format-MySQL 0.04_02 0.9999
+YINST requires pkg ypan/perl-Encode 2.42_01 2.9999
+YINST requires pkg ypan/perl-Exporter 5.63_02 5.9999
+YINST requires pkg ypan/perl-File-BOM 0.14_01 0.9999
+YINST requires pkg ypan/perl-File-Temp 0.22_02 0.9999
+YINST requires pkg ypan/perl-Getopt-Long 2.38_03 2.9999
+YINST requires pkg ypan/perl-Log-Log4perl 1.32_02 1.9999
+YINST requires pkg ypan/perl-Params-Validate 0.95_03 0.9999
+YINST requires pkg ypan/perl-Scalar-List-Utils 1.23_03 1.9999
+YINST requires pkg ypan/perl-Sub-Uplevel 0.2002_01 0.9999
+YINST requires pkg ypan/perl-Text-CSV_XS 0.73_01 0.9999
+YINST requires pkg ypan/perl-YAML 0.68_01 0.9999
+YINST requires pkg ypan/perl-base 2.12_03 2.9999
+YINST requires pkg ypan/perl-DBD-mysql51 4.010_02 4.9999
+
+
+# YINST settings
+YINST set Database_MainDB_Driver        dbi:mysql:database=sast;host=localhost;port=7306
+YINST set Database_MainDB_Username      test
+YINST set Database_MainDB_Password      test
+YINST set SupportedLanguages            <<Dynamic>>
+

@@ -1,0 +1,49 @@
+use CYC::Database::MainDB;
+
+use Log::Log4perl;
+my $_logger = Log::Log4perl::get_logger(__PACKAGE__);
+
+sub admin_only {
+    return 1;
+}
+
+sub process_request {
+    my ($self, $r, $args) = @_;
+    my $promoters = [];
+    my $sth = CYC::Database::MainDB->connect()->prepare(qq/
+        SELECT 
+            cyc_promoter.id as id, 
+            cyc_promoter.full_name as full_name, 
+            cyc_promoter.email as email, 
+            cyc_user.full_name as created_by, 
+            cyc_promoter.club as club, 
+            cyc_promoter.mobile_number as mobile_number,
+            cyc_promoter.description as description, 
+            cyc_promoter.sex as sex,
+            convert_tz(cyc_promoter.create_timestamp, 'SYSTEM', '+00:00') as create_timestamp,
+            convert_tz(cyc_promoter.update_timestamp, 'SYSTEM', '+00:00') as update_timestamp,
+            count(cyc_client.id) as client_count
+        FROM cyc_user 
+            JOIN cyc_promoter on cyc_user.email = cyc_promoter.created_by
+            LEFT JOIN cyc_client on cyc_promoter.id = cyc_client.promoter_id
+        WHERE cyc_promoter.is_deleted = 0
+        GROUP BY cyc_promoter.id
+    /);
+    $sth->execute();
+    while (my $r = $sth->fetchrow_hashref) {
+        push @$promoters, { promoter => {
+            id => $r->{id},
+            created_by => $r->{created_by},
+            email => $r->{email},
+            full_name => $r->{full_name},
+            club => $r->{club},
+            mobile_number => $r->{mobile_number},
+            description => $r->{description},
+            sex => $r->{sex},
+            create_timestamp => $r->{create_timestamp},
+            update_timestamp => $r->{update_timestamp},
+            client_count => $r->{client_count},
+        }};
+    }
+    return $promoters;
+}

@@ -1,0 +1,8 @@
+Core:
+    Database:
+        MainDB:
+            Driver: $(Database_MainDB_Driver)
+            Username: $(Database_MainDB_Username)
+            Password: $(Database_MainDB_Password)
+    SupportedLanguages: $(SupportedLanguages)
+    SupportedMarkets: $(SupportedMarkets)

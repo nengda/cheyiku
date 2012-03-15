@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DialogFixed xmlns="DTS.UI.*" xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" horizontalScrollPolicy="off" verticalScrollPolicy="off">
+	<mx:Script>
+		<![CDATA[
+			[Bindable]
+			private var _hint:String = null;
+
+			[Bindable]
+			private var _value:String = null;
+
+			private var _onValidate:Function = null;
+			private var _onComplete:Function = null;
+			private var _onCancel:Function = null;			
+
+			public static function Open(title:String, hint:String, value:String, onValidate:Function, onComplete:Function, onCancel:Function=null):TextInputPrompt {
+				var dlg:TextInputPrompt = DialogFixed.Open(TextInputPrompt) as TextInputPrompt;
+				dlg.title = title;
+				dlg._hint = hint;
+				dlg._value = value;
+				dlg._onValidate = onValidate;
+				dlg._onComplete = onComplete;
+				dlg._onCancel = onCancel;
+				return dlg;
+			}
+
+			private function OnOKClicked(event:Event=null):void {
+				if (_onValidate(txtInput.text) == true) {
+					_onComplete(txtInput.text);
+					Close();
+				}
+			}
+		]]>
+	</mx:Script>
+	<mx:Label id="lblHint" text="{_hint}"/>
+	<mx:TextInput id="txtInput" text="{_value}" y="20" left="0" right="0" focusThickness="0" enter="OnOKClicked()">
+		<mx:creationComplete>
+			<![CDATA[
+				txtInput.setFocus();
+			]]>
+		</mx:creationComplete>
+	</mx:TextInput>
+	<ControlBarResizable horizontalAlign="right" paddingTop="8" WindowMinWidth="320" WindowMinHeight="200">
+		<mx:Button label="OK" click="OnOKClicked()"/>
+		<mx:Button label="Cancel">
+			<mx:click>
+				<![CDATA[
+					if (_onCancel != null) {
+						_onCancel();
+					}
+					Close();
+				]]>
+			</mx:click>
+		</mx:Button>
+	</ControlBarResizable>
+</DialogFixed>

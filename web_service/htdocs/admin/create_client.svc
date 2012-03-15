@@ -1,0 +1,92 @@
+use CYC::Web::Model::Client;
+use CYC::Web::Model::Promoter;
+use CYC::Web::Model::Profession;
+use CYC::Web::Model::District;
+use CYC::Web::Model::Car;
+use CYC::Web::Model::Service;
+use CYC::Web::Model::ServiceInterest;
+use CYC::Web::HandlerFault;
+
+use DateTime;
+use Digest::SHA1 qw/sha1_hex/;
+
+sub args {
+    return {
+        access_code => 1,
+        full_name => 1,
+        email => 1,
+        sex => 1,
+        mobile_number => 1,
+        car_id => 1,
+        profession_id => 1,
+        district_id => 1,
+        license => 1,
+        year_of_purchase => 1,
+        mileage => 1,
+        service_ids => 1,
+    }
+}
+
+sub process_request {
+    my ($self, $r, $args) = @_;
+
+    # validate access code
+    my $promoter;
+    eval {
+        $promoter = CYC::Web::Model::Promoter->new(id => $args->{access_code})->load;
+    };
+    if ($@ || not defined $promoter) {
+        die CYC::Web::HandlerFault->new(message => "Invalid code '$args->{access_code}'", displayable => 1);
+    }
+
+    # validate profession
+    my $profession;
+    eval {
+        $profession = CYC::Web::Model::Profession->new(id => $args->{profession_id})->load;
+    };
+    if ($@ || not defined $profession) {
+        die CYC::Web::HandlerFault->new(message => "Invalid profession '$args->{profession_id}'", displayable => 1);
+    }
+
+    # validate car
+    my $car;
+    eval {
+        $car = CYC::Web::Model::Car->new(id => $args->{car_id})->load;
+    };
+    if ($@ || not defined $car) {
+        die CYC::Web::HandlerFault->new(message => "Invalid car '$args->{car_id}'", displayable => 1);
+    }
+
+    # validate district
+    my $district;
+    eval {
+        $district = CYC::Web::Model::District->new(id => $args->{district_id})->load;
+    };
+    if ($@ || not defined $district) {
+        die CYC::Web::HandlerFault->new(message => "Invalid district '$args->{district_id}'", displayable => 1);
+    }
+
+    # validate service
+    my @service_ids = split /,/, $args->{service_ids};
+    for my $id (@service_ids) {
+        my $service;
+        eval {
+            $service = CYC::Web::Model::Service->new(id => $id)->load;
+        };
+        if ($@ || not defined $service) {
+            die CYC::Web::HandlerFault->new(message => "Invalid service '$id'", displayable => 1);
+        }
+    }
+
+    $args->{promoter_id} = $args->{access_code};
+    $args->{create_timestamp} = DateTime->now();
+    $args->{update_timestamp} = DateTime->now();
+    $args->{id} = (substr($args->{access_code}, 0, 2) . substr(sha1_hex($args->{email} . $args->{create_timestamp}->iso8601()), 0, 8));
+    $args->{is_deleted} = 0;
+    my $client = CYC::Web::Model::Client->new(%$args)->save();
+    for my $id (@service_ids) {
+        CYC::Web::Model::ServiceInterest->new(service_id => $id, client_id => $client->id)->save();
+    }
+    
+    return "Success";
+}

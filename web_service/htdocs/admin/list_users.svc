@@ -1,0 +1,24 @@
+use CYC::Web::Model::User;
+
+use Log::Log4perl;
+my $_logger = Log::Log4perl::get_logger(__PACKAGE__);
+
+sub admin_only {
+    return 1;
+}
+
+sub process_request {
+    my ($self, $r, $args) = @_;
+    my $users = [];
+    my $user_objects = CYC::Web::Model::User->get_objects();
+    for my $user (@$user_objects) {
+        push @$users, { user => {
+            email => $user->email,
+            full_name => $user->full_name,
+            is_admin => ($user->is_admin ? 'Y' : 'N'),
+            is_deleted => ($user->is_deleted ? 'Y' : 'N'),
+            create_timestamp => $user->create_timestamp->iso8601()
+        }};
+    }
+    return $users;
+}

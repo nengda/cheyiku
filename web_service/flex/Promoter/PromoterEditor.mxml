@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DialogFixed xmlns="DTS.UI.*" xmlns:mx="http://www.adobe.com/2006/mxml" width="500" height="360" title="推广人资料" layout="absolute" borderThicknessLeft="0" borderThicknessRight="0" creationComplete="OnCreationComplete()">
+	<mx:Script>
+		<![CDATA[
+			import DTS.Net.HTTPClient;
+			import DTS.UI.BlockingWindow;
+			import DTS.UI.MessageBox;
+			import DTS.Logger.LogWindow;
+			import DTS.UI.TextInputPrompt;
+
+			private var _promoter:XML = null;
+
+			public static function Open(promoter:XML):PromoterEditor {
+				var dlg:PromoterEditor = DialogFixed.Open(PromoterEditor) as PromoterEditor;
+				dlg._promoter = promoter;
+				return dlg;
+			}
+
+			private function OnCreationComplete():void {
+				if (_promoter == null) {
+					callLater(OnCreationComplete);
+					return;
+				}
+				if (_promoter.id == undefined) {
+					title = "新推广人";
+					txtName.setFocus();
+					lblCompulsory.visible = true;
+					lblStarName.visible = true;
+					lblStarEmail.visible = true;
+					lblStarMobile.visible = true;
+				}
+				else {
+					lblCompulsory.visible = false;
+					lblStarName.visible = false;
+					lblStarEmail.visible = false;
+					lblStarMobile.visible = false;
+
+					txtEmail.text = _promoter.email;
+					txtName.text = _promoter.full_name;
+					txtMobile.text = _promoter.mobile_number;
+					txtClub.text = _promoter.club;
+					txtDescription.text = _promoter.description;
+					comboSex.selectedItem = (_promoter.sex == "M" ? "男" : "女");
+				}
+			}
+
+			private function Save():void {
+				if (txtName.text.match(/^\s*$/) != null) {
+					MessageBox.Show("姓名呢？\n\n", "", function():void{
+						txtName.setFocus();
+					});
+					return;
+				}
+				if (txtEmail.text.match(/^\s*$/) != null) {
+					MessageBox.Show("Email呢？\n\n", "", function():void{
+						txtEmail.setFocus();
+					});
+					return;
+				}
+				if (txtMobile.text.match(/^\s*$/) != null) {
+					MessageBox.Show("手机号码呢？\n\n", "", function():void{
+						txtMobile.setFocus();
+					});
+					return;
+				}
+				if (txtMobile.text.match(/^[0-9]+$/) == null) {
+					MessageBox.Show("手机号码只能是数字？\n\n", "", function():void{
+						txtMobile.setFocus();
+					});
+					return;
+				}
+
+				var request:Object = {
+					"email": txtEmail.text,
+					"full_name": txtName.text,
+					"club": txtClub.text,
+					"mobile_number": txtMobile.text,
+					"description": txtDescription.text,
+					"sex" : ((comboSex.selectedItem as String) == "男" ? "M" : "F")
+				};
+
+				visible = false;
+				if (_promoter.id == undefined) {
+					var textInput:TextInputPrompt = MessageBox.PromptForText("邀请码", "请输入邀请码前两位", "", function(text:String):Boolean {
+						if (text.match(/^[A-Za-z0-9]{2}$/) != null){
+							return true;
+						} else {
+							MessageBox.Show("邀请码前缀只能是数字或字母，且长度只能是二。\n\n");
+							return false;
+						}
+					}, function(text:String):void {
+						request.id_prefix = text;
+						Submit(request);
+					}, function():void {
+						visible = true;
+					});
+					textInput.width = 200;
+				} else {
+					request.id = _promoter.id;
+					Submit(request);
+				}
+			}
+			
+			private function Submit(request:Object):void {
+				var blockingWindow:BlockingWindow = BlockingWindow.Open();
+				HTTPClient.Post(
+					"PromoterEditor",
+					Settings.EndPoint + "update_promoter.svc",
+					request,
+					function(response:String):void {
+						blockingWindow.Close();
+						visible = true;
+						var xml:XML = XML(response);
+						if (xml.status.toString().toLowerCase() == "ok") {
+							GlobalEvents.FireEvent(GlobalEvents.REFRESH_PROMOTERS);
+							Close();
+						}
+						else {
+							MessageBox.Show(xml.data.toString() + "\n\n");
+						}
+					}
+				);
+			}
+		]]>
+	</mx:Script>
+	<mx:Canvas borderStyle="solid" borderSides="top,bottom" left="0" right="0" top="0" bottom="0" backgroundColor="#FFFFFF">
+		<mx:Label x="20" y="22" text="姓名:"/>
+		<mx:Label x="82" y="24" text="*" color="red" id="lblStarName" visible="false"/>
+		<mx:TextInput id="txtName" y="20" left="99" right="25"/>
+		<mx:Label x="20" y="50" text="性别:"/>
+		<mx:ComboBox id="comboSex" y="48" left="99" right="25">
+			<mx:dataProvider>
+				<mx:ArrayCollection>
+					<mx:String>男</mx:String>
+					<mx:String>女</mx:String>
+				</mx:ArrayCollection>
+			</mx:dataProvider>
+		</mx:ComboBox>
+		<mx:Label x="20" y="78" text="Email:"/>
+		<mx:Label x="82" y="80" text="*" color="red" id="lblStarEmail" visible="false"/>
+		<mx:TextInput id="txtEmail" y="76" left="99" right="25"/>
+		<mx:Label x="20" y="106" text="手机号码:"/>
+		<mx:Label x="82" y="108" text="*" color="red" id="lblStarMobile" visible="false"/>
+		<mx:TextInput id="txtMobile" y="104" left="99" right="25"/>
+		<mx:Label x="20" y="134" text="俱乐部:"/>
+		<mx:TextInput id="txtClub" y="132" left="99" right="25"/>
+		<mx:Label x="20" y="162" text="备注:"/>
+		<mx:TextArea id="txtDescription" y="160" left="99" right="25" height="100"/>
+	</mx:Canvas>
+	<ControlBarResizable horizontalAlign="right" x="0" y="276" paddingTop="8">
+		<mx:Label text="* 必须填写" color="red" id="lblCompulsory" visible="false"/>
+		<mx:Spacer width="100%"/>
+		<mx:Button label="保存" id="btnOK" click="Save()"/>
+		<mx:Button label="取消" id="btnCancel" click="Close()"/>
+	</ControlBarResizable>
+</DialogFixed>

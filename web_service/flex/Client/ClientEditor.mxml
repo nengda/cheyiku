@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DialogFixed xmlns="DTS.UI.*" xmlns:mx="http://www.adobe.com/2006/mxml" width="560" height="420" title="客户资料" layout="absolute" borderThicknessLeft="0" borderThicknessRight="0" creationComplete="OnCreationComplete()">
+	<mx:Script>
+		<![CDATA[
+			import mx.events.ListEvent;
+			import mx.controls.CheckBox;
+			import DTS.Net.HTTPClient;
+			import DTS.UI.BlockingWindow;
+			import DTS.UI.MessageBox;
+			import DTS.Logger.LogWindow;
+			import DTS.UI.TextInputPrompt;
+
+			private var _client:XML = null;
+			private var _serviceBoxes:Object = null;
+			private var _carModel:Object = null;
+
+			public static function Open(client:XML):ClientEditor {
+				var dlg:ClientEditor = DialogFixed.Open(ClientEditor) as ClientEditor;
+				dlg._client = client;
+				return dlg;
+			}
+
+			private function OnCreationComplete():void {
+				if (_client == null) {
+					callLater(OnCreationComplete);
+					return;
+				}
+				
+				_carModel = ClientPage.Instance.CarModel;
+				cmbProfession.dataProvider = ClientPage.Instance.Profession;
+				cmbDistrict.dataProvider = ClientPage.Instance.District;
+				cmbCarBrand.dataProvider = ClientPage.Instance.CarBrand;
+				cmbYearOfPurchase.dataProvider = ClientPage.Instance.Year;
+				
+				_serviceBoxes = new Object();
+				var count:Number = 0;
+				var rowBoxNumber:Number = 4;
+				var widthBase:Number = (cvsServiceInterest.width / rowBoxNumber);
+				var heightBase:Number = 28;
+				for each (var service:Object in ClientPage.Instance.Service) {
+					var box:CheckBox = new CheckBox();
+					box.label = service.name;
+					box.x = (count % rowBoxNumber) * widthBase;
+					box.y = int(count / rowBoxNumber) * heightBase;
+					cvsServiceInterest.addChild(box);
+					_serviceBoxes[service.name] = {checkBox: box, id: service.id};
+					count++;
+				}
+				if (_client.id == undefined) {
+					title = "新客户";
+					txtName.setFocus();
+					lblCompulsory.visible = true;
+					lblStarName.visible = true;
+					lblStarEmail.visible = true;
+					lblStarMobile.visible = true;
+
+					cmbCarModel.dataProvider = _carModel[cmbCarBrand.selectedItem];
+					cmbCarModel.dropdown.dataProvider = _carModel[cmbCarBrand.selectedItem];
+					cmbCarModel.selectedIndex = 0;
+				}
+				else {
+					lblCompulsory.visible = false;
+					lblStarName.visible = false;
+					lblStarEmail.visible = false;
+					lblStarMobile.visible = false;
+
+					txtEmail.text = _client.email;
+					txtName.text = _client.full_name;
+					txtMobile.text = _client.mobile_number;
+					txtLicense.text = _client.license;
+					txtMileage.text = _client.mileage;
+					cmbYearOfPurchase.selectedItem = _client.year_of_purchase.toString();
+					cmbProfession.selectedItem = FindObject(_client.profession, ClientPage.Instance.Profession);
+					cmbDistrict.selectedItem = FindObject(_client.district, ClientPage.Instance.District);
+					cmbSex.selectedItem = (_client.sex == "M" ? "男" : "女");
+					cmbCarBrand.selectedItem = _client.car_brand.toString();
+					cmbCarModel.dataProvider = _carModel[_client.car_brand.toString()];
+					cmbCarModel.dropdown.dataProvider = _carModel[_client.car_brand.toString()];
+					cmbCarModel.selectedItem = FindObject(_client.car_model, _carModel[_client.car_brand.toString()]);
+					
+					var services:Array = _client.services.toString().split(",");
+					for each (var s:String in services) {
+						CheckBox(_serviceBoxes[s].checkBox).selected = true;
+					}
+				}
+			}
+			
+			private function FindObject(name:String, list:Array):Object {
+				for each (var obj:Object in list) {
+					if (obj.name == name) {
+						return obj;
+					}
+				}
+				return null;
+			}
+			
+			private function OnBrandChange(event:ListEvent):void {
+//				var dp:Array = new Array();
+//				for each (var o:Object in _carModel[cmbCarBrand.selectedItem]) {
+//					dp.push(o.name);
+//				}
+				cmbCarModel.dataProvider = _carModel[cmbCarBrand.selectedItem];
+				cmbCarModel.dropdown.dataProvider = _carModel[cmbCarBrand.selectedItem];
+			}
+
+			private function Save():void {
+				if (txtName.text.match(/^\s*$/) != null) {
+					MessageBox.Show("姓名呢？\n\n", "", function():void{
+						txtName.setFocus();
+					});
+					return;
+				}
+				if (txtEmail.text.match(/^\s*$/) != null) {
+					MessageBox.Show("Email呢？\n\n", "", function():void{
+						txtEmail.setFocus();
+					});
+					return;
+				}
+				if (txtMobile.text.match(/^\s*$/) != null) {
+					MessageBox.Show("手机号码呢？\n\n", "", function():void{
+						txtMobile.setFocus();
+					});
+					return;
+				}
+				if (txtMobile.text.match(/^[0-9]+$/) == null) {
+					MessageBox.Show("手机号码只能是数字.\n\n", "", function():void{
+						txtMobile.setFocus();
+					});
+					return;
+				}
+
+				if (txtMileage.text.match(/^[0-9]+$/) == null) {
+					MessageBox.Show("公里数只能是数字.\n\n", "", function():void{
+						txtMileage.setFocus();
+					});
+					return;
+				}
+				
+				var services:Array = new Array();
+				for each (var service:Object in _serviceBoxes) {
+					if (CheckBox(service.checkBox).selected) {
+						services.push(service.id);
+					}
+				}
+
+				if (services.length > 3) {
+					MessageBox.Show("最多只能选三项服务.\n\n");
+					return;
+				}
+
+				var request:Object = {
+					"email": txtEmail.text,
+					"full_name": txtName.text,
+					"mobile_number": txtMobile.text,
+					"sex" : ((cmbSex.selectedItem as String) == "男" ? "M" : "F"),
+					"car_id" : cmbCarModel.selectedItem.id,
+					"profession_id" : cmbProfession.selectedItem.id,
+					"district_id" : cmbDistrict.selectedItem.id,
+					"license" : txtLicense.text,
+					"year_of_purchase": cmbYearOfPurchase.selectedItem,
+					"mileage" : txtMileage.text,
+					"service_ids": services.join(",")
+				};
+				
+				
+
+				visible = false;
+				if (_client.id == undefined) {
+					Submit(request);
+				} else {
+					request.id = _client.id;
+					Submit(request);
+				}
+			}
+			
+			private function Submit(request:Object):void {
+				var blockingWindow:BlockingWindow = BlockingWindow.Open();
+				HTTPClient.Post(
+					"ClientEditor",
+					Settings.EndPoint + "update_client.svc",
+					request,
+					function(response:String):void {
+						blockingWindow.Close();
+						visible = true;
+						var xml:XML = XML(response);
+						if (xml.status.toString().toLowerCase() == "ok") {
+							GlobalEvents.FireEvent(GlobalEvents.REFRESH_CLIENTS);
+							Close();
+						}
+						else {
+							MessageBox.Show(xml.data.toString() + "\n\n");
+						}
+					}
+				);
+			}
+		]]>
+	</mx:Script>
+	<mx:Canvas borderStyle="solid" borderSides="top,bottom" left="0" right="0" top="0" bottom="0" backgroundColor="#FFFFFF">
+		<mx:Label x="20" y="22" text="姓名:"/>
+		<mx:Label x="82" y="24" text="*" color="red" id="lblStarName" visible="false"/>
+		<mx:TextInput id="txtName" y="20" left="99" width="100"/>
+		<mx:Label x="219" y="22" text="Email:"/>
+		<mx:Label x="281" y="24" text="*" color="red" id="lblStarEmail" visible="false"/>
+		<mx:TextInput id="txtEmail" y="20" left="298" right="25"/>
+		<mx:Label x="20" y="50" text="性别:"/>
+		<mx:ComboBox id="cmbSex" y="48" left="99" width="100">
+			<mx:dataProvider>
+				<mx:ArrayCollection>
+					<mx:String>男</mx:String>
+					<mx:String>女</mx:String>
+				</mx:ArrayCollection>
+			</mx:dataProvider>
+		</mx:ComboBox>
+		<mx:Label x="219" y="50" text="手机号码:"/>
+		<mx:Label x="281" y="52" text="*" color="red" id="lblStarMobile" visible="false"/>
+		<mx:TextInput id="txtMobile" y="48" left="298" right="25"/>
+		<mx:Label x="20" y="78" text="地址(区):"/>
+		<mx:ComboBox id="cmbDistrict" y="76" left="99" width="100" labelField="name"/>
+		<mx:Label x="219" y="78" text="职业:"/>
+		<mx:ComboBox id="cmbProfession" y="76" left="298" right="25" labelField="name"/>
+		<mx:HRule y="116" left="20" right="25" />
+		
+		<mx:Label x="20" y="134" text="品牌:"/>
+		<mx:ComboBox id="cmbCarBrand" y="132" left="99" labelField="name" width="100" change="OnBrandChange(event)"/>
+		<mx:Label x="219" y="134" text="车型:"/>
+		<mx:ComboBox id="cmbCarModel" y="132" left="298" right="25" labelField="name"/>
+		<mx:Label x="20" y="162" text="车牌:"/>
+		<mx:TextInput id="txtLicense" y="160" left="99" width="100"/>
+		<mx:Label x="219" y="162" text="购买时间(年):"/>
+		<mx:ComboBox id="cmbYearOfPurchase" y="160" left="298" right="25"/>
+		<mx:Label x="20" y="190" text="公里数:"/>
+		<mx:TextInput id="txtMileage" y="188" left="99" width="100"/>
+		<mx:HRule y="228" left="20" right="25" />
+
+		<mx:Label x="20" y="246" text="服务:"/>
+		<mx:Canvas id="cvsServiceInterest" y="246" left="99" right="25" horizontalScrollPolicy="off" verticalScrollPolicy="off"/>
+	</mx:Canvas>
+	<ControlBarResizable horizontalAlign="right" x="0" y="276" paddingTop="8">
+		<mx:Label text="* 必须填写" color="red" id="lblCompulsory" visible="false"/>
+		<mx:Spacer width="100%"/>
+		<mx:Button label="保存" id="btnOK" click="Save()"/>
+		<mx:Button label="取消" id="btnCancel" click="Close()"/>
+	</ControlBarResizable>
+</DialogFixed>

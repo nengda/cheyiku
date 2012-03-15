@@ -1,0 +1,43 @@
+use CYC::Web::Model::User;
+use CYC::Web::HandlerFault;
+use DateTime;
+use Digest::SHA1 qw/sha1_hex/;
+
+use Log::Log4perl;
+my $_logger = Log::Log4perl::get_logger(__PACKAGE__);
+
+sub admin_only {
+    return 1;
+}
+
+sub args {
+    return {
+        email => 1,
+        full_name => 1,
+        is_admin => 1,
+        is_deleted => 1,
+        password => 0,
+    };
+}
+
+sub process_request {
+    my ($self, $r, $args) = @_;
+    my $user;
+    eval {
+        $user = CYC::Web::Model::User->new(email => $args->{email})->load;
+    };
+    if ($@ || not defined $user) {
+        # new user
+        die CYC::Web::HandlerFault->new(message => "Password cannot be empty", displayable => 1) unless $args->{password};
+        $args->{create_timestamp} = DateTime->now();
+        $args->{password} = sha1_hex($args->{password});
+        CYC::Web::Model::User->new(%$args)->save();
+
+    } else {
+        $user->full_name($args->{full_name});
+        $user->is_admin($args->{is_admin});
+        $user->is_deleted($args->{is_deleted});
+        $user->save();
+    }
+    return "SUCCESS";
+}

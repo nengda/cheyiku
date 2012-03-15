@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" verticalCenter="0" horizontalCenter="0" width="600" borderStyle="solid" alpha="0.8" cornerRadius="8" backgroundColor="#EEEEEE">
+	<mx:Script>
+		<![CDATA[
+			import mx.core.Application;
+			import mx.managers.PopUpManager;
+
+			private var _initialized:Boolean = false;
+			private var _message:String = "";
+
+			public function get message():String {
+				return _message;
+			}
+
+			public function set message(value:String):void {
+				_message = value;
+				if (lblMessage != null) {
+					lblMessage.text = _message;
+				}
+			}
+
+			public static function Open(message:String="正在加载..."):BlockingWindow {
+				var app:Application = Application.application as Application;
+				var blockingWindow:BlockingWindow = PopUpManager.createPopUp(app, BlockingWindow, true) as BlockingWindow;
+				PopUpManager.centerPopUp(blockingWindow);
+				blockingWindow.message = message;
+				return blockingWindow;
+			}
+
+			public function Close():void {
+				if (!_initialized) {
+					callLater(Close);
+					return;
+				}
+				callLater(function(window:BlockingWindow):void {
+					PopUpManager.removePopUp(window);
+				}, [this]);
+			}
+		]]>
+	</mx:Script>
+	<mx:ProgressBar id="progressBar" indeterminate="true" labelPlacement="top" left="10" right="10" top="10" bottom="10" label=""/>
+	<!-- Use a label to display the message since it responses faster -->
+	<mx:Label id="lblMessage" y="10" fontWeight="bold" text="Loading..." left="10" right="10">
+		<mx:creationComplete>
+			<![CDATA[
+				_initialized = true;
+				lblMessage.text = _message;
+			]]>
+		</mx:creationComplete>
+	</mx:Label>
+</mx:Canvas>

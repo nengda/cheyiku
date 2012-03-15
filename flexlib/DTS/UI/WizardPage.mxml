@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml">
+	<mx:Metadata>
+		[Event(name="ProceedComplete", type="DTS.Core.GenericEvent")]
+		[Event(name="ProceedAbort", type="DTS.Core.GenericEvent")]
+	</mx:Metadata>
+	<mx:Script>
+		<![CDATA[
+			import DTS.Core.GenericEvent;
+
+			public static const EVENT_PROCEEDCOMPLETE:String = "ProceedComplete";
+			public static const EVENT_PROCEEDABORT:String = "ProceedAbort";
+
+			private var _dirty:Boolean = true;
+			private var _wizard:WizardBase = null;
+
+			public function get Dirty():Boolean {
+				return _dirty;
+			}
+
+			public function set Dirty(value:Boolean):void {
+				_dirty = value;
+			}
+
+			public function get ParentWizard():WizardBase {
+				return _wizard;
+			}
+
+			public function set ParentWizard(value:WizardBase):void {
+				_wizard = value;
+			}
+
+			public function Show():void {
+				
+			}
+
+			public function Hide():void {
+				
+			}
+
+			public function BeginProceed():String {
+				dispatchEvent(new GenericEvent(EVENT_PROCEEDCOMPLETE, null));
+				return "";
+			}
+
+			public function Cancel():void {
+			}
+		]]>
+	</mx:Script>
+</mx:Canvas>

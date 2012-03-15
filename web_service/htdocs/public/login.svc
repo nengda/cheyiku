@@ -1,0 +1,32 @@
+use CYC::Web::Authentication;
+use CYC::Web::HandlerFault;
+
+use Log::Log4perl;
+my $_logger = Log::Log4perl::get_logger(__PACKAGE__);
+
+sub args {
+    return {
+        u => 1,
+        p => 1,
+    }
+}
+
+sub process_request {
+    my ($self, $r, $args) = @_;
+
+    my $session;
+    eval{
+        $session = CYC::Web::Authentication->login(
+            $args->{u},
+            $args->{p},
+            $r->connection->remote_ip
+        );
+    };
+    if (my $e = $@) {
+        $_logger->warn("Authentication failed: $e\n");
+        die CYC::Web::HandlerFault->new(message => "Invalid email/pasword", displayable => 1);
+    } else {
+        $r->header_out('Set-Cookie', $session->cookie);
+        return "Login Success";
+    }
+}

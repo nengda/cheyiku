@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns="*" xmlns:mx="http://www.adobe.com/2006/mxml" label="内部用户" creationComplete="OnCreationComplete()">
+	<mx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import DTS.Core.GenericEvent;
+			import DTS.Net.HTTPClient;
+			import DTS.UI.BlockingWindow;
+			import DTS.UI.DataGridClasses.FilterableHeader;
+			import DTS.UI.DataGridClasses.FilterPanels.FilterPanelBase;
+			import DTS.UI.DataGridClasses.FilterPanels.FilterPanelString;
+			import DTS.UI.DataGridClasses.FilterPanels.FilterPanelEnum;
+			import DTS.UI.DataGridClasses.FilterPanels.FilterPanelDate;
+			import DTS.UI.Colors;
+			import DTS.Utilities.DataGridColumns;
+			import DTS.Utilities.ListDoubleClick;
+			import mx.collections.XMLListCollection;
+			import mx.events.ListEvent;
+			import mx.skins.ProgrammaticSkin;
+
+			private static var _instance:UserPage = null;
+			public static function get Instance():UserPage {
+				return _instance;
+			}
+
+			protected var _filterPanels:Array = null;
+			private var _statusFilter:FilterPanelEnum;
+
+			private function OnCreationComplete():void {
+				_instance = this;
+				GlobalEvents.AddEventHandler(GlobalEvents.REFRESH_USERS, function(event:GenericEvent):void {
+					Refresh();
+				});
+				Refresh(true);
+			}
+
+			public function Refresh(onStart:Boolean = false):void {
+				if (pnlLoading == null) {
+					callLater(Refresh);
+					return;
+				}
+
+				if (pnlLoading.visible) {
+					return;
+				}
+
+				pnlLoading.visible = true;
+				HTTPClient.Post(
+					"UserPage",
+					Settings.EndPoint + "list_users.svc",
+					{},
+					function(response:String):void {
+						pnlLoading.visible = false;
+						var xmlUser:XML = XML(response);
+						var users:XMLList = xmlUser.data.user;
+						for each (var user:XML in users) {
+							user.is_admin = (user.is_admin == 'Y' ? "是" : "否");
+							user.is_deleted = (user.is_deleted == 'Y' ? "禁用" : "开启");
+						}
+						if (onStart){
+							_statusFilter.FilterValue = {
+								"开启" : true,
+								"禁用" : false
+							};
+						}
+						var dp:XMLListCollection = new XMLListCollection(users);
+						dp.filterFunction = FilterFunction;
+						dp.refresh();
+						dgUsers.dataProvider = dp;
+				},
+					function():void {
+						pnlLoading.visible = false;
+					}
+				);
+			}
+
+			private function FilterFunction(o:Object):Boolean {
+				for each (var fp:FilterPanelBase in _filterPanels) {
+					if (!fp.Filter(o)) {
+						return false;
+					}
+				}
+				return true;
+			}
+
+			private function OnFilterChanged(event:Event=null):void {
+				callLater(function():void {
+					var dp:XMLListCollection = dgUsers.dataProvider as XMLListCollection;
+					if (dp != null) {
+						dp.refresh();
+						dgUsers.invalidateList();
+					}
+				});
+			}
+
+			private function InitDataGrid():void {
+				var columns:Array = new Array();
+				_filterPanels = new Array();
+				AddColumn(columns, _filterPanels,
+					{headerText: "邮箱", dataField: "email"},
+					new FilterPanelString("email", OnFilterChanged)
+				);
+				AddColumn(columns, _filterPanels,
+					{headerText: "姓名", dataField: "full_name"},
+					new FilterPanelString("full_name", OnFilterChanged)
+				);
+				AddColumn(columns, _filterPanels,
+					{headerText: "创建时间", dataField: "create_timestamp", datetime: true},
+					new FilterPanelDate("create_timestamp", OnFilterChanged)
+				);
+				AddColumn(columns, _filterPanels,
+					{headerText: "管理员?", width: 100, dataField: "is_admin"},
+                    new FilterPanelEnum("is_admin", ["是", "否"], OnFilterChanged)
+				);
+				_statusFilter = new FilterPanelEnum("is_deleted", ["开启", "禁用"], OnFilterChanged);
+				AddColumn(columns, _filterPanels,
+					{headerText: "状态", width: 100, dataField: "is_deleted"},
+                    _statusFilter
+				); 
+				AddColumn(columns, _filterPanels,
+					{headerText: "", dataField: "", width: 60, resizable: false, sortable: false, itemRenderer: {
+						rendererClass: UserActions, properties: { IsItemHighlighted: dgUsers.isItemHighlighted }
+					}}
+				);
+				DataGridColumns.Create(dgUsers, columns);
+				ListDoubleClick.OnItemDoubleClicked(dgUsers, function(item:Object):void {
+					var xml:XML = item as XML;
+					switch (xml.localName().toString().toLowerCase()) {
+						case "user":
+							UserEditor.Open(xml);
+							break;
+					}
+				});
+			}
+
+			private function AddColumn(columns:Array, filterPanels:Array, c:Object, f:FilterPanelBase=null):void {
+				if (f != null) {
+					c["headerRenderer"] = {
+						rendererClass: FilterableHeader,
+						properties: { FilterPanel: f }
+					};
+					filterPanels.push(f);
+				}
+				columns.push(c);
+			}
+
+			private function OnItemRollOver(event:ListEvent):void {
+				try {
+					UserActions.ItemToInstance(event.itemRenderer.data).alpha = 1;
+				}
+				catch (error:Error) {}
+			}
+
+			private function OnItemRollOut(event:ListEvent):void {
+				try {
+					UserActions.ItemToInstance(event.itemRenderer.data).alpha = 0;
+				}
+				catch (error:Error) {}
+			}
+		]]>
+	</mx:Script>
+	<mx:DataGrid id="dgUsers" left="0" right="0" top="0" bottom="36" borderSides="top" rowHeight="24" allowMultipleSelection="false" alternatingItemColors="[#FFFFFF, #FFFFFF]" horizontalGridLines="false" verticalGridLines="false" creationComplete="InitDataGrid()" itemRollOver="OnItemRollOver(event)" itemRollOut="OnItemRollOut(event)"/>
+	<mx:Canvas id="pnlLoading" left="10" bottom="46" borderStyle="solid" borderThickness="0" backgroundColor="{Colors.THEME_COLOR}" cornerRadius="5" visible="false" backgroundAlpha="0.8">
+		<mx:Label text="加载中..." color="#FFFFFF" fontWeight="bold" left="10" right="10" top="5" bottom="5"/>
+	</mx:Canvas>
+	<mx:Canvas height="36" borderSides="top" borderStyle="solid" bottom="0" left="0" right="0" backgroundColor="#EEEEEE">
+		<mx:HBox verticalCenter="0" verticalAlign="middle" right="10" horizontalGap="0">
+			<mx:Button id="btnAdd" label="新用户" icon="{Icons.ICO_ADD}" skin="mx.skins.ProgrammaticSkin">
+				<mx:click>
+					<![CDATA[
+						UserEditor.Open(XML(<user/>));
+					]]>
+				</mx:click>
+				<mx:mouseOver>
+					<![CDATA[
+						btnAdd.setStyle("textDecoration", "underline");
+					]]>
+				</mx:mouseOver>
+				<mx:mouseOut>
+					<![CDATA[
+						btnAdd.setStyle("textDecoration", "none");
+					]]>
+				</mx:mouseOut>
+			</mx:Button>
+			<mx:Button id="btnRefresh" label="刷新" icon="{Icons.ICO_REFRESH}" skin="mx.skins.ProgrammaticSkin" click="Refresh()">
+				<mx:mouseOver>
+					<![CDATA[
+						btnRefresh.setStyle("textDecoration", "underline");
+					]]>
+				</mx:mouseOver>
+				<mx:mouseOut>
+					<![CDATA[
+						btnRefresh.setStyle("textDecoration", "none");
+					]]>
+				</mx:mouseOut>
+			</mx:Button>
+		</mx:HBox>
+	</mx:Canvas>
+</mx:Canvas>

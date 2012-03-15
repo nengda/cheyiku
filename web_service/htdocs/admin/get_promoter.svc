@@ -1,0 +1,29 @@
+use CYC::Web::Model::Promoter;
+
+use Log::Log4perl;
+my $_logger = Log::Log4perl::get_logger(__PACKAGE__);
+
+sub admin_only {
+    return 1;
+}
+
+sub args {
+    return {
+        id => 1,
+    };
+}
+
+
+sub process_request {
+    my ($self, $r, $args) = @_;
+    my $promoter = CYC::Web::Model::Promoter->new(id => $args->{id})->load;
+    return {
+        id => $promoter->id,
+        email => $promoter->email,
+        full_name => $promoter->full_name,
+        club => $promoter->club,
+        mobile_number => $promoter->mobile_number,
+        description => $promoter->description,
+        sex => $promoter->sex,
+    };
+}

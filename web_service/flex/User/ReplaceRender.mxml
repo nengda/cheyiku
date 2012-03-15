@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" alpha="0" horizontalScrollPolicy="off">
+	<mx:Script>
+		<![CDATA[
+			public var Reference:Object = null;
+			public var Key:String = null;
+
+			override public function set data(value:Object):void {
+				super.data = value;
+				if (value != null) {
+					if (Reference[value[Key]] != null){
+						//XML(value[Key]).setChildren(Reference[value[Key]]);
+						value[Key] = Reference[value[Key]];
+					}
+					lblView.text = value[Key];
+				}
+			}
+		]]>
+	</mx:Script>
+	<mx:HBox x="2" verticalCenter="0" horizontalGap="0">
+		<mx:Label id="lblView"/>
+	</mx:HBox>
+</mx:Canvas>

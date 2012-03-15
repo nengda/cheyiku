@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" alpha="0" horizontalScrollPolicy="off">
+	<mx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import DTS.UI.MessageBox;
+			import DTS.Net.HTTPClient;
+			import DTS.UI.BlockingWindow;
+
+			private static var _instances:ArrayCollection = new ArrayCollection();
+
+			public var IsItemHighlighted:Function = null;
+
+			public static function ItemToInstance(o:Object):ClientActions {
+				for (var i:int = _instances.length - 1; i >= 0; i--) {
+					var instance:ClientActions = _instances[i];
+					if (IsSameItem(instance.data, o)) {
+						return instance;
+					}
+				}
+				return null;
+			}
+
+			private static function IsSameItem(a:Object, b:Object):Boolean {
+				if (a != null && b != null) {
+					var toolA:String = a.id;
+					var toolB:String = b.id;
+					if (toolA == toolB) {
+						return true;
+					}
+				}
+				return false;
+			}
+
+			override public function set data(value:Object):void {
+				super.data = value;
+				if (_instances.contains(this)) {
+					_instances.removeItemAt(_instances.getItemIndex(this));
+				}
+				if (value != null) {
+					_instances.addItem(this);
+					alpha = (IsItemHighlighted(value)) ? 1 : 0;
+				}
+				else {
+					alpha = 0;
+				}
+			}
+		]]>
+	</mx:Script>
+	<mx:Style>
+		.HoverButton {
+			upSkin: ClassReference("mx.skins.ProgrammaticSkin");
+		}
+	</mx:Style>
+	<mx:HBox x="2" verticalCenter="0" horizontalGap="0">
+		<mx:Button id="btnEdit" icon="{Icons.ICO_EDIT}" toolTip="编辑" width="20" height="20" styleName="HoverButton">
+			<mx:click>
+				<![CDATA[
+					ClientEditor.Open(data as XML);
+				]]>
+			</mx:click>
+		</mx:Button>
+		<mx:Button id="btnDelete" icon="{Icons.ICO_DELETE}" toolTip="删除" width="20" height="20" styleName="HoverButton">
+			<mx:click>
+				<![CDATA[
+					MessageBox.ConfirmYesNo("确定删除客户'" + data.full_name + "'?", "删除", function():void {
+						var blockingWindow:BlockingWindow = BlockingWindow.Open();
+						HTTPClient.Post(
+							"ClientActions",
+							Settings.EndPoint + "delete_client.svc",
+							{ "id": data.id },
+							function(response:String):void {
+								blockingWindow.Close();
+								var xml:XML = XML(response);
+								if (xml.status.toString().toLowerCase() == "ok") {
+									GlobalEvents.FireEvent(GlobalEvents.REFRESH_CLIENTS);
+								}
+								else {
+									MessageBox.Show(xml.data.toString() + "\n\n");
+								}
+							}
+						);
+					}); 
+				]]>
+			</mx:click>
+		</mx:Button>
+	</mx:HBox>
+</mx:Canvas>

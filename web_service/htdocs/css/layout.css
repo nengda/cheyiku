@@ -1,0 +1,65 @@
+body {
+    color: #333333;
+    font-family: Verdana;
+    font-size: 9pt;
+    margin: 0px 0px 0px 0px;
+    background: #e7e7e7 url("/images/background.png") repeat-x 0 0;
+}
+
+#dts-header {
+    height: 37px;
+    color: #e7e7e7;
+    font-size: 10pt;
+    cursor: default;
+}
+
+#dts-header-brand {
+    position: absolute;
+    top: 11px;
+    left: 20px;
+    height: 27px;
+    background: url("/images/cheyiku_icon.png") no-repeat 0 0;
+    padding-top: 1px;
+    padding-left: 32px;
+    cursor: default;
+    z-index: 501;
+    font-size: 10pt;
+    font-weight: bold;
+}
+
+#dts-header-user {
+    position: absolute;
+    top: 11px;
+    right: 10px;
+    height: 16px;
+    background: url("/images/person.png") no-repeat 0 0;
+    padding-top: 1px;
+    padding-left: 19px;
+    cursor: default;
+    z-index: 501;
+    font-size: 8pt;
+}
+
+#dts-title {
+    position: relative;
+    height: 45px;
+    cursor: default;
+}
+
+#dts-title-text {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 14pt;
+    color: #423702;
+}
+
+.dts-full-screen {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 38px;
+    bottom: 0;
+}
+
+
